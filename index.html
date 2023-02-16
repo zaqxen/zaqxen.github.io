@@ -1,200 +1,211 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Under Construction!</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@100&display=swap" rel="stylesheet"> 
-    <style>
-      h1 {
-        font-family: 'Prompt', sans-serif;
-        font-size: 4.5em;
-        color: #fff;
-        text-shadow: 2px 2px 4px #aaa;
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Under Construction!</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<!-- <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@100&display=swap" rel="stylesheet">  -->
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tagalog&display=swap" rel="stylesheet">
+	<style>
+		h1{
+			font-size: 4.5em;
+		}
+		h1,main {
+			font-family: 'Noto Sans Tagalog', sans-serif;
+			color: #fff;
+			text-align: center;
+			text-shadow: 2px 2px 4px #aaa;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
 
-        -webkit-user-select: none;  
-        -moz-user-select: none;    
-        -ms-user-select: none;      
-        user-select: none;
-      }
+		html, body {
+				margin: 0px;
+				background-color: #3c3c3c;
+				/*background: -webkit-radial-gradient(#00d2ff, #3a7bd5);  Chrome 10-25, Safari 5.1-6 */
+				/*background: radial-gradient(#00d2ff, #3a7bd5);  W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		}
+	canvas {
+				display: block;
+		}
+		.dg.main{
+				display: none;
+		}
+	</style>
 
-      html, body {
-            margin: 0px;
-            background-color: #3c3c3c;
-            /*background: -webkit-radial-gradient(#00d2ff, #3a7bd5);  Chrome 10-25, Safari 5.1-6 */
-            /*background: radial-gradient(#00d2ff, #3a7bd5);  W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-        }
-    canvas {
-            display: block;
-        }
-        .dg.main{
-            display: none;
-        }
-    </style>
-    
-    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js" type="text/javascript"></script> -->
-    
-  </head>
-  <body>
-    <h1 class="d-block my-auto position-absolute top-50 start-50 translate-middle">Page Under Construction!</h1>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js" type="text/javascript"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-        // Handler when the DOM is fully loaded
+	<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js" type="text/javascript"></script> -->
 
-            var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-            window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+</head>
+<body>
+	<main class="d-block my-auto position-absolute top-50 start-50 translate-middle">
+		<h1>ᜀᜅ᜔ ᜉᜑᜒᜈᜇ᜔ᜌᜅ᜔ ᜁᜆᜓ ᜀᜌ᜔ ᜃᜐᜎᜓᜃᜓᜓᜌᜅ᜔ ᜊᜒᜈᜓᜊᜓᜂ</h1>
+		<details>
+				<summary>Translation</summary>
+				<p>Ang pahinaryang ito ay kasalukuyang binubuo</p>
+				<p>This webpage is under construction</p>
+			</details>
 
-            var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+	</main>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js" type="text/javascript"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function(){
+		// Handler when the DOM is fully loaded
 
-            var rAF;
+				var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+				window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
+				var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
 
-            var canvas = document.getElementById("canvas"),
-                context = canvas.getContext("2d"),
-                width = canvas.width = window.innerWidth,
-                height = canvas.height = window.innerHeight,
-                particles = [],
-                mouseX = 0,
-                mouseY = 0,
-                total = 15,
-                followSpeed = 0.1,
-                size = 25;
-
-            document.body.addEventListener("mousemove", function (event) {
-                mouseX = event.clientX;
-                mouseY = event.clientY;
-            });
-
-            window.addEventListener('resize', function () {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            });
-
-            function init() {
-                cancelAnimationFrame(rAF);
-
-                particles = [];
-
-                for (var i = 0; i < total; i += 1) {
-                    particles.push(new Particle(i));
-                }
-
-                draw();
-            }
-
-            function draw() {
-                context.clearRect(0, 0, width, height);
-
-                for (var i = 0; i < total; i += 1) {
-                    particles[i].update();
-                }
-
-                rAF = requestAnimationFrame(draw);
-            }
+				var rAF;
 
 
-            /**
-             * Particle
-             */
-            var Particle, p;
+				var canvas = document.getElementById("canvas"),
+					context = canvas.getContext("2d"),
+					width = canvas.width = window.innerWidth,
+					height = canvas.height = window.innerHeight,
+					particles = [],
+					mouseX = 0,
+					mouseY = 0,
+					total = 15,
+					followSpeed = 0.1,
+					size = 25;
 
-            Particle = function (index) {
-                this.initialize(index);
-            };
+				document.body.addEventListener("mousemove", function (event) {
+					mouseX = event.clientX;
+					mouseY = event.clientY;
+				});
 
-            p = Particle.prototype;
+				window.addEventListener('resize', function () {
+					width = canvas.width = window.innerWidth;
+					height = canvas.height = window.innerHeight;
+				});
 
-            p.initialize = function (index) {
-                this.x = -50;
-                this.y = height;
-                this.id = index + 1;
-                this.angleX = Math.PI * 2 * Math.random();
-                this.angleY = Math.PI * 2 * Math.random();
-                this.speedX = .03 * Math.random() + .03;
-                this.speedY = .03 * Math.random() + .03;
-                this.radius = 150;
+				function init() {
+					cancelAnimationFrame(rAF);
 
-                return this;
-            };
+					particles = [];
 
-            p.update = function () {
-                var aim, dx, dy, scale, angle;
+					for (var i = 0; i < total; i += 1) {
+						particles.push(new Particle(i));
+					}
 
-                if (this.id > 1) {
-                    aim = particles[this.id - 1 - 1];
-                    dx = aim.x - this.x;
-                    dy = aim.y - this.y;
+					draw();
+				}
 
-                    this.x += dx * con.speed;
-                    this.y += dy * con.speed;
-                } else {
-                    if (mouseX === 0 && mouseY === 0) {
-                        dx = width / 2 + Math.cos(this.angleX) * this.radius - this.x;
-                        dy = height / 2 + Math.sin(this.angleY) * this.radius - this.y;
+				function draw() {
+					context.clearRect(0, 0, width, height);
 
-                        this.x = width / 2 + Math.cos(this.angleX) * this.radius;
-                        this.y = height / 2 + Math.sin(this.angleY) * this.radius;
+					for (var i = 0; i < total; i += 1) {
+						particles[i].update();
+					}
 
-                        this.angleX += this.speedX;
-                        this.angleY += this.speedY;
+					rAF = requestAnimationFrame(draw);
+				}
 
-                    } else {
-                        dx = mouseX - this.x;
-                        dy = mouseY - this.y;
 
-                        this.x += dx * con.speed;
-                        this.y += dy * con.speed;
-                    }
-                }
+				/**
+				 * Particle
+				 */
+				var Particle, p;
 
-                angle = Math.atan2(dy, dx);
-                scale = Math.cos(Math.PI / 2 * (this.id / total));
+				Particle = function (index) {
+					this.initialize(index);
+				};
 
-                context.save();
-                context.translate(this.x, this.y);
-                context.rotate(angle);
-                context.scale(scale, scale);
+				p = Particle.prototype;
 
-                context.beginPath();
-                context.moveTo(-size / 2 * 1.732, -size / 2);
-                context.lineTo(0, 0);
-                context.lineTo(-size / 2 * 1.732, size / 2);
-                context.lineTo(-size / 2 * 1.2, 0);
-                context.fillStyle = 'white';
-                context.fill();
+				p.initialize = function (index) {
+					this.x = -50;
+					this.y = height;
+					this.id = index + 1;
+					this.angleX = Math.PI * 2 * Math.random();
+					this.angleY = Math.PI * 2 * Math.random();
+					this.speedX = .03 * Math.random() + .03;
+					this.speedY = .03 * Math.random() + .03;
+					this.radius = 150;
 
-                context.restore();
-            };
+					return this;
+				};
 
-            // control bar
-            var ControlBar = function () {
-                this.num = total;
-                this.speed = followSpeed;
-            };
+				p.update = function () {
+					var aim, dx, dy, scale, angle;
 
-            var con = new ControlBar();
-            var gui = new dat.GUI();
-            var conSpeed = gui.add(con, 'speed', 0.05, 0.25).step(0.05);
-            var conNum = gui.add(con, 'num', 10, 30).step(1);
+					if (this.id > 1) {
+						aim = particles[this.id - 1 - 1];
+						dx = aim.x - this.x;
+						dy = aim.y - this.y;
 
-            conNum.onFinishChange(function (value) {
-                total = value;
+						this.x += dx * con.speed;
+						this.y += dy * con.speed;
+					} else {
+						if (mouseX === 0 && mouseY === 0) {
+								dx = width / 2 + Math.cos(this.angleX) * this.radius - this.x;
+								dy = height / 2 + Math.sin(this.angleY) * this.radius - this.y;
 
-                init();
-            });
+								this.x = width / 2 + Math.cos(this.angleX) * this.radius;
+								this.y = height / 2 + Math.sin(this.angleY) * this.radius;
 
-            init();
-        });
+								this.angleX += this.speedX;
+								this.angleY += this.speedY;
 
-    </script>
+						} else {
+								dx = mouseX - this.x;
+								dy = mouseY - this.y;
 
-    <canvas id="canvas"></canvas>
-    
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script> -->
-    
-  </body>
+								this.x += dx * con.speed;
+								this.y += dy * con.speed;
+						}
+					}
+
+					angle = Math.atan2(dy, dx);
+					scale = Math.cos(Math.PI / 2 * (this.id / total));
+
+					context.save();
+					context.translate(this.x, this.y);
+					context.rotate(angle);
+					context.scale(scale, scale);
+
+					context.beginPath();
+					context.moveTo(-size / 2 * 1.732, -size / 2);
+					context.lineTo(0, 0);
+					context.lineTo(-size / 2 * 1.732, size / 2);
+					context.lineTo(-size / 2 * 1.2, 0);
+					context.fillStyle = 'white';
+					context.fill();
+
+					context.restore();
+				};
+
+				// control bar
+				var ControlBar = function () {
+					this.num = total;
+					this.speed = followSpeed;
+				};
+
+				var con = new ControlBar();
+				var gui = new dat.GUI();
+				var conSpeed = gui.add(con, 'speed', 0.05, 0.25).step(0.05);
+				var conNum = gui.add(con, 'num', 10, 30).step(1);
+
+				conNum.onFinishChange(function (value) {
+					total = value;
+
+					init();
+				});
+
+				init();
+		});
+
+	</script>
+
+	<canvas id="canvas"></canvas>
+
+	<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script> -->
+
+</body>
 </html>
