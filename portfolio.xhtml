@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="description" content=""/>
+	<meta name="author" content="Mark Morgan Miranda"/>
+	<title>Mark Morgan Miranda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"/>
+	<style>
+		:root{
+			--green:#28B80F;
+			/* Green Plants Color Palette Below */
+			--brunswick:#1E5631;
+			--sea:#358856;
+			--crayolasforest:#5aab61;
+			--mantis:#62bd69;
+			--deepmoss:#30694b;
+			--phthalo:#0c3823;
+
+			/* Minimal Color Pallete */
+			--g0:hsl(120, 85%, 40%);
+			--g1:hsl(120, 40%, 8%);
+			--g2:hsl(120, 20%, 35%);
+			--g3:hsl(120, 8%, 88%);
+		}
+		@font-face {
+			font-family: 'Lexend Exa';
+			src: font-url('assests/fonts/LexendExa-VariableFont_wght.ttf') format('ttf'),font-url('LexendExa-VariableFont_wght.ttf') format('ttf');
+		}
+		@font-face {
+			font-family: 'Lexend';
+			src: font-url('assests/fonts/Lexend-VariableFont_wght.ttf') format('ttf'),font-url('Lexend-VariableFont_wght.ttf') format('ttf');
+		}
+		@font-face {
+			font-family: 'Noto Sans Tagalog';
+			src: font-url('assests/fonts/NotoSansTagalog-Regular') format('ttf'),font-url('NotoSansTagalog-Regular') format('ttf');
+		}
+		html,body{
+			font-family: 'Lexend','Noto Sans Tagalog',Arial ,Verdana ,Tahoma ,'Trebuchet MS', sans-serif;
+			font-weight: 300;
+		}
+		a{
+			text-decoration: none;
+			color: inherit;
+		}
+
+		.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+		}
+
+		@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+			font-size: 3.5rem;
+			}
+		}
+
+		.b-example-divider {
+			height: 3rem;
+			background-color: rgba(0, 0, 0, .1);
+			border: solid rgba(0, 0, 0, .15);
+			border-width: 1px 0;
+			box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+		}
+
+		.b-example-vr {
+			flex-shrink: 0;
+			width: 1.5rem;
+			height: 100vh;
+		}
+
+		.bi {
+			vertical-align: -.125em;
+			fill: currentColor;
+		}
+
+		.nav-scroller {
+			position: relative;
+			z-index: 2;
+			height: 2.75rem;
+			overflow-y: hidden;
+		}
+
+		.nav-scroller .nav {
+			display: flex;
+			flex-wrap: nowrap;
+			padding-bottom: 1rem;
+			margin-top: -1px;
+			overflow-x: auto;
+			text-align: center;
+			white-space: nowrap;
+			-webkit-overflow-scrolling: touch;
+		}
+		/* Light mode */
+		@media (prefers-color-scheme: light) {
+			html,body{
+				background-color: var(--g3);
+				color:#000;
+			}
+			.icon-list li::before {
+				background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z'/%3E%3C/svg%3E") no-repeat center center / 100% auto;
+			}
+		}
+		/* Dark mode */
+		@media (prefers-color-scheme: dark) {
+			html,body{
+				background-color: var(--g1);
+				color:#fff;
+			}
+			.text-muted, .text-muted *{
+				filter: brightness(4)!important;
+				opacity: 1.0!important;
+			}
+			.icon-list li::before {
+				background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z'/%3E%3C/svg%3E") no-repeat center center / 100% auto;
+			}
+		}
+	</style>
+	<style>
+		/* replace bullets with circle right arrow */
+		.icon-list li::before {
+			display: block;
+			flex-shrink: 0;
+			width: 1.5em;
+			height: 1.5em;
+			margin-right: .5rem;
+			content: "";
+		}
+	</style>
+</head>
+<body>
+
+<div class="col-lg-8 mx-auto p-4 py-md-5">
+<header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+	<a href="/" class="d-flex align-items-center text-decoration-none">
+	<!-- <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img"><title>Bootstrap</title><path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z" fill="currentColor"></path></svg> -->
+
+	<svg
+   width="40"
+   height="32"
+   viewBox="0, 0, 400,332.427843803056"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g transform="matrix(0.99777182,0,0,0.99944802,-2.0995437,0.09925547)">
+    <path
+       d="m 306.66655,48.752995 c -45.73,5.73 -73.25833,45.14522 -88.49833,78.995215 l -104.11569,5.19706 C 113.85259,108.80514 104.3917,90.923549 95.311703,83.053549 79.410919,70.275472 59.073858,74.665317 43.253858,79.935317 c -5.03,1.67 -18.239667,7.775286 -17.699667,8.315286 55.51,-3.46 72.089049,23.895497 57.263629,55.088767 l -31.234707,59.24642 c -19.356802,44.92377 15.602064,86.67696 46.852061,93.54696 0,0 45.066286,8.70962 90.580646,-36.37937 16.24105,-18.87679 26.49091,-34.89286 45.81091,-83.15286 11.68,-29.17 12.21198,-29.30349 19.78198,-46.77349 6.53,-15.08 18.91521,-36.970016 36.44049,-46.773481 73.52852,-28.951734 67.34206,48.485811 46.85206,77.955811 0,0 25.07471,-19.70113 31.23471,-50.93113 6.71,-34.010001 -20.79942,-65.525235 -62.46942,-61.325235 M 202.55086,176.60052 c 0,0 -25.13437,57.71875 -48.93437,72.75875 -17.88205,15.03013 -39.91132,21.38411 -55.181316,10.39411 -13.699739,-10.06064 -23.661569,-24.60877 -10.411569,-55.08877 20.379995,-41.41 10.664298,-21.76643 21.864295,-41.57643 l 98.9099,-4.15765"
+       stroke="none"
+       fill="#28B80F"
+       fill-rule="evenodd" />
+  </g>
+  <ellipse
+  	 fill="currentColor"
+     cx="172.21774"
+     cy="60.582794"
+     rx="24.914482"
+     ry="24.210186" />
+  <ellipse
+  	 fill="currentColor"
+     cx="249.5977"
+     cy="286.44006"
+     rx="24.914482"
+     ry="24.210186" />
+</svg>
+
+
+
+	<span class="fs-4">Starter template</span>
+	</a>
+</header>
+<main class="container">
+	<div class="p-4 p-md-5 mb-4 rounded text-bg-dark">
+	  <div class="col-md-6 px-0">
+		<h1 class="display-4 fst-italic">Title of a longer featured blog post</h1>
+		<p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
+		<p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
+	  </div>
+	</div>
+
+	<div class="row mb-2">
+	  <div class="col-md-6">
+		<div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+		  <div class="col p-4 d-flex flex-column position-static">
+			<strong class="d-inline-block mb-2 text-primary">World</strong>
+			<h3 class="mb-0">Featured post</h3>
+			<div class="mb-1 text-muted">Nov 12</div>
+			<p class="card-text mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+			<a href="#" class="stretched-link">Continue reading</a>
+		  </div>
+		  <div class="col-auto d-none d-lg-block">
+			<svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+		  </div>
+		</div>
+	  </div>
+	  <div class="col-md-6">
+		<div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+		  <div class="col p-4 d-flex flex-column position-static">
+			<strong class="d-inline-block mb-2 text-success">Design</strong>
+			<h3 class="mb-0">Post title</h3>
+			<div class="mb-1 text-muted">Nov 11</div>
+			<p class="mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+			<a href="#" class="stretched-link">Continue reading</a>
+		  </div>
+		  <div class="col-auto d-none d-lg-block">
+			<svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+	<div class="row g-5">
+	  <div class="col-md-8">
+		<h3 class="pb-4 mb-4 fst-italic border-bottom">
+		  From the Firehose
+		</h3>
+
+		<article class="blog-post">
+		  <h2 class="blog-post-title mb-1">Sample blog post</h2>
+		  <p class="blog-post-meta">January 1, 2021 by <a href="#">Mark</a></p>
+
+		  <p>This blog post shows a few different types of content that&#x2019;s supported and styled with Bootstrap. Basic typography, lists, tables, images, code, and more are all supported as expected.</p>
+		  <hr/>
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <h2>Blockquotes</h2>
+		  <p>This is an example blockquote in action:</p>
+		  <blockquote class="blockquote">
+			<p>Quoted text goes here.</p>
+		  </blockquote>
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <h3>Example lists</h3>
+		  <p>This is some additional paragraph placeholder content. It&#x2019;s a slightly shorter version of the other highly repetitive body text used throughout. This is an example unordered list:</p>
+		  <ul>
+			<li>First list item</li>
+			<li>Second list item with a longer description</li>
+			<li>Third list item to close it out</li>
+		  </ul>
+		  <p>And this is an ordered list:</p>
+		  <ol>
+			<li>First list item</li>
+			<li>Second list item with a longer description</li>
+			<li>Third list item to close it out</li>
+		  </ol>
+		  <p>And this is a definition list:</p>
+		  <dl>
+			<dt>HyperText Markup Language (HTML)</dt>
+			<dd>The language used to describe and define the content of a Web page</dd>
+			<dt>Cascading Style Sheets (CSS)</dt>
+			<dd>Used to describe the appearance of Web content</dd>
+			<dt>JavaScript (JS)</dt>
+			<dd>The programming language used to build advanced Web sites and applications</dd>
+		  </dl>
+		  <h2>Inline HTML elements</h2>
+		  <p>HTML defines a long list of available inline tags, a complete list of which can be found on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">Mozilla Developer Network</a>.</p>
+		  <ul>
+			<li><strong>To bold text</strong>, use <code class="language-plaintext highlighter-rouge">&lt;strong&gt;</code>.</li>
+			<li><em>To italicize text</em>, use <code class="language-plaintext highlighter-rouge">&lt;em&gt;</code>.</li>
+			<li>Abbreviations, like <abbr title="HyperText Markup Language">HTML</abbr> should use <code class="language-plaintext highlighter-rouge">&lt;abbr&gt;</code>, with an optional <code class="language-plaintext highlighter-rouge">title</code> attribute for the full phrase.</li>
+			<li>Citations, like <cite>— Mark Otto</cite>, should use <code class="language-plaintext highlighter-rouge">&lt;cite&gt;</code>.</li>
+			<li><del>Deleted</del> text should use <code class="language-plaintext highlighter-rouge">&lt;del&gt;</code> and <ins>inserted</ins> text should use <code class="language-plaintext highlighter-rouge">&lt;ins&gt;</code>.</li>
+			<li>Superscript <sup>text</sup> uses <code class="language-plaintext highlighter-rouge">&lt;sup&gt;</code> and subscript <sub>text</sub> uses <code class="language-plaintext highlighter-rouge">&lt;sub&gt;</code>.</li>
+		  </ul>
+		  <p>Most of these elements are styled by browsers with few modifications on our part.</p>
+		  <h2>Heading</h2>
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We&#x2019;ll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <h3>Sub-heading</h3>
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We&#x2019;ll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <pre><code>Example code block</code></pre>
+		  <p>This is some additional paragraph placeholder content. It&#x2019;s a slightly shorter version of the other highly repetitive body text used throughout.</p>
+		</article>
+
+		<article class="blog-post">
+		  <h2 class="blog-post-title mb-1">Another blog post</h2>
+		  <p class="blog-post-meta">December 23, 2020 by <a href="#">Jacob</a></p>
+
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We&#x2019;ll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <blockquote>
+			<p>Longer quote goes here, maybe with some <strong>emphasized text</strong> in the middle of it.</p>
+		  </blockquote>
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We&#x2019;ll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <h3>Example table</h3>
+		  <p>And don't forget about tables in these posts:</p>
+		  <table class="table">
+			<thead>
+			  <tr>
+				<th>Name</th>
+				<th>Upvotes</th>
+				<th>Downvotes</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>Alice</td>
+				<td>10</td>
+				<td>11</td>
+			  </tr>
+			  <tr>
+				<td>Bob</td>
+				<td>4</td>
+				<td>3</td>
+			  </tr>
+			  <tr>
+				<td>Charlie</td>
+				<td>7</td>
+				<td>9</td>
+			  </tr>
+			</tbody>
+			<tfoot>
+			  <tr>
+				<td>Totals</td>
+				<td>21</td>
+				<td>23</td>
+			  </tr>
+			</tfoot>
+		  </table>
+
+		  <p>This is some additional paragraph placeholder content. It&#x2019;s a slightly shorter version of the other highly repetitive body text used throughout.</p>
+		</article>
+
+		<article class="blog-post">
+		  <h2 class="blog-post-title mb-1">New feature</h2>
+		  <p class="blog-post-meta">December 14, 2020 by <a href="#">Chris</a></p>
+
+		  <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+		  <ul>
+			<li>First list item</li>
+			<li>Second list item with a longer description</li>
+			<li>Third list item to close it out</li>
+		  </ul>
+		  <p>This is some additional paragraph placeholder content. It&#x2019;s a slightly shorter version of the other highly repetitive body text used throughout.</p>
+		</article>
+
+		<nav class="blog-pagination" aria-label="Pagination">
+		  <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
+		  <a class="btn btn-outline-secondary rounded-pill disabled">Newer</a>
+		</nav>
+
+	  </div>
+
+	  <div class="col-md-4">
+		<div class="position-sticky" style="top: 2rem;">
+		  <div class="p-4 mb-3 bg-light rounded">
+			<h4 class="fst-italic">About</h4>
+			<p class="mb-0">Customize this section to tell your visitors a little bit about your publication, writers, content, or something else entirely. Totally up to you.</p>
+		  </div>
+
+		  <div class="p-4">
+			<h4 class="fst-italic">Archives</h4>
+			<ol class="list-unstyled mb-0">
+			  <li><a href="#">March 2021</a></li>
+			  <li><a href="#">February 2021</a></li>
+			  <li><a href="#">January 2021</a></li>
+			  <li><a href="#">December 2020</a></li>
+			  <li><a href="#">November 2020</a></li>
+			  <li><a href="#">October 2020</a></li>
+			  <li><a href="#">September 2020</a></li>
+			  <li><a href="#">August 2020</a></li>
+			  <li><a href="#">July 2020</a></li>
+			  <li><a href="#">June 2020</a></li>
+			  <li><a href="#">May 2020</a></li>
+			  <li><a href="#">April 2020</a></li>
+			</ol>
+		  </div>
+
+		  <div class="p-4">
+			<h4 class="fst-italic">Elsewhere</h4>
+			<ol class="list-unstyled">
+			  <li><a href="#">GitHub</a></li>
+			  <li><a href="#">Twitter</a></li>
+			  <li><a href="#">Facebook</a></li>
+			</ol>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+  </main>
+<main>
+	<h1>Get started with Bootstrap</h1>
+	<p class="fs-5 col-md-8">Quickly and easily get started with Bootstrap's compiled, production-ready files with this barebones example featuring some basic HTML and helpful links. Download all our examples to get started.</p>
+
+	<div class="mb-5">
+	<a href="../examples/" class="btn btn-primary btn-lg px-4">Download examples</a>
+	</div>
+
+	<hr class="col-3 col-md-2 mb-5"/>
+
+	<div class="row g-5">
+	<div class="col-md-6">
+		<h2>Starter projects</h2>
+		<p>Ready to beyond the starter template? Check out these open source projects that you can quickly duplicate to a new GitHub repository.</p>
+		<ul class="icon-list ps-0">
+		<li class="d-flex align-items-start mb-1"><a href="https://github.com/twbs/bootstrap-npm-starter" rel="noopener" target="_blank">Bootstrap npm starter</a></li>
+		<li class="text-muted d-flex align-items-start mb-1">Bootstrap Parcel starter (coming soon!)</li>
+		</ul>
+	</div>
+
+	<div class="col-md-6">
+		<h2>Guides</h2>
+		<p>Read more detailed instructions and documentation on using or contributing to Bootstrap.</p>
+		<ul class="icon-list ps-0">
+		<li class="d-flex align-items-start mb-1"><a href="../getting-started/introduction/">Bootstrap quick start guide</a></li>
+		<li class="d-flex align-items-start mb-1"><a href="../getting-started/webpack/">Bootstrap Webpack guide</a></li>
+		<li class="d-flex align-items-start mb-1"><a href="../getting-started/parcel/">Bootstrap Parcel guide</a></li>
+		<li class="d-flex align-items-start mb-1"><a href="../getting-started/vite/">Bootstrap Vite guide</a></li>
+		<li class="d-flex align-items-start mb-1"><a href="../getting-started/contribute/">Contributing to Bootstrap</a></li>
+		</ul>
+	</div>
+	</div>
+</main>
+<footer class="pt-5 my-5 text-muted border-top">
+	Created by the Bootstrap team &middot; &copy; 2022
+</footer>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+
+</body>
+</html>

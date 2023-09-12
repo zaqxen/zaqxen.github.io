@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="description" content=""/>
+	<meta name="author" content="Mark Morgan Miranda"/>
+	<title>Mark Morgan Miranda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"/>
+	<link rel="icon" href="assets/media/favicon.svg"/>
+	<link rel="mask-icon" href="assets/media/favicon.svg" color="#000000"/>
+	<link rel="apple-touch-icon" href="assets/media/m.png"/>
+	<style>
+		:root{
+			/* --primary:#000800;
+			--secondary:#FFFFFF;
+			--accent:#008800; */
+
+			--primary:#f1f7f2;
+			--secondary:#00080048;
+			--accent:#008800;
+			--green:#28B80F; /* Greenest Green */
+			color-scheme: dark;
+		}
+		@font-face {
+			font-family: 'Lexend Exa';
+			src: font-url('assests/fonts/LexendExa-VariableFont_wght.ttf') format('ttf'),font-url('LexendExa-VariableFont_wght.ttf') format('ttf');
+		}
+		@font-face {
+			font-family: 'Lexend';
+			src: font-url('assests/fonts/Lexend-VariableFont_wght.ttf') format('ttf'),font-url('Lexend-VariableFont_wght.ttf') format('ttf');
+		}
+		@font-face {
+			font-family: 'Noto Sans Tagalog';
+			src: font-url('assests/fonts/NotoSansTagalog-Regular') format('ttf'),font-url('NotoSansTagalog-Regular') format('ttf');
+		}
+		html,body{
+			font-family: 'Lexend','Noto Sans Tagalog',Arial ,Verdana ,Tahoma ,'Trebuchet MS', sans-serif;
+			font-weight: 300;
+		}
+		a{
+			text-decoration: none;
+			color: var(--accent);
+		}
+
+		.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+		}
+
+		@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+				font-size: 3.5rem;
+			}
+		}
+
+		.b-example-divider {
+			height: 3rem;
+			background-color: rgba(0, 0, 0, .1);
+			border: solid rgba(0, 0, 0, .15);
+			border-width: 1px 0;
+			box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+		}
+
+		.b-example-vr {
+			flex-shrink: 0;
+			width: 1.5rem;
+			height: 100vh;
+		}
+
+		.bi {
+			vertical-align: -.125em;
+			fill: currentColor;
+		}
+
+		.nav-scroller {
+			position: relative;
+			z-index: 2;
+			height: 2.75rem;
+			overflow-y: hidden;
+		}
+
+		.nav-scroller .nav {
+			display: flex;
+			flex-wrap: nowrap;
+			padding-bottom: 1rem;
+			margin-top: -1px;
+			overflow-x: auto;
+			text-align: center;
+			white-space: nowrap;
+			-webkit-overflow-scrolling: touch;
+		}
+		/* Light mode */
+		/* @media (prefers-color-scheme: light) { */
+
+
+			html,body{
+				background-color: var(--primary);
+				color:#000;
+			}
+			.bg-secondary{
+				background-color: var(--secondary)!important;
+				color: #fff;
+			}
+			.icon-list li::before {
+				background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z'/%3E%3C/svg%3E") no-repeat center center / 100% auto;
+			}
+		/* } */
+		/* Dark mode */
+		/* @media (prefers-color-scheme: dark) {
+			:root{
+				--bs-body-bg:var(--secondary);
+			}
+			html,body{
+				background-color: var(--secondary);
+				color:#fff;
+			}
+			.bg-secondary{
+				background-color: var(--primary)!important;
+				color: #000;
+			}
+			.text-muted, .text-muted *{
+				filter: brightness(4)!important;
+				opacity: 1.0!important;
+			}
+			.icon-list li::before {
+				background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z'/%3E%3C/svg%3E") no-repeat center center / 100% auto;
+			}
+			.bg-light{
+				color: #000;
+			}
+		} */
+	</style>
+	<style>
+		/* replace bullets with circle right arrow */
+		.icon-list li::before {
+			display: block;
+			flex-shrink: 0;
+			width: 1.5em;
+			height: 1.5em;
+			margin-right: .5rem;
+			content: "";
+		}
+	</style>
+</head>
+<body class="container">
+	<header class="d-flex align-items-center pb-3 mt-2 mb-5 border-bottom">
+		<span class="d-flex align-items-center text-decoration-none">
+			<svg
+			viewBox="0 0 400 320"
+			height="32"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlns:svg="http://www.w3.org/2000/svg">
+				<ellipse
+				cx="172.21774"
+				cy="60.582794"
+				rx="24.914482"
+				ry="24.210186"
+				fill="currentColor"
+				id="ellipse6" />
+				<path
+				d="m 112.07826,295.86243 q -25.546741,0 -41.042305,-22.19635 -15.076764,-22.61515 -15.076764,-60.72586 0,-15.07676 0.837598,-26.38434 1.256397,-11.30757 2.931593,-23.45274 2.512794,-17.17076 5.025588,-27.64073 2.512794,-10.88878 2.512794,-21.35875 H 0.67772134 V 85.625323 H 54.283995 q 22.196347,0 33.503921,5.025588 11.726372,4.606789 11.726372,25.546739 0,5.44439 -0.418799,9.63238 -0.418799,4.18799 -1.256397,7.11958 13.401568,-4.18799 28.897128,-5.86318 15.91437,-1.6752 25.96554,-1.6752 21.77755,0 39.78591,4.60679 18.00836,4.60679 32.66632,11.72637 4.18799,-5.86319 10.88878,-16.75196 7.11958,-10.88877 22.19634,-35.179117 19.26476,-30.991127 36.85432,-45.230293 18.00835,-14.239166 43.13629,-14.239166 21.77755,0 37.27312,11.307573 15.91436,11.307573 23.87154,30.991127 l -26.38434,11.307573 q -5.44438,-14.239166 -15.07676,-19.683553 -9.21358,-5.444388 -21.35875,-5.444388 -14.23917,0 -26.38434,10.051177 -11.72637,10.051176 -26.38434,33.922717 -20.93995,35.17912 -33.92272,56.95667 -12.98277,21.35875 -21.35875,34.76032 -7.95718,13.40156 -15.49556,24.29034 -13.82037,20.52115 -29.73473,38.11071 -15.91436,17.58956 -33.50392,28.47833 -17.58956,10.46998 -37.69191,10.46998 z m 0,-28.47834 q 15.91436,0 31.82872,-13.40156 16.33316,-13.40157 32.66633,-36.01672 16.75196,-23.03394 33.92272,-51.93108 -12.98277,-5.86318 -28.89714,-8.79478 -15.49556,-3.35039 -30.15352,-3.35039 -15.49557,0 -30.57233,2.9316 -15.07677,2.51279 -28.478335,7.11958 -2.093995,10.46997 -3.350392,23.45274 -0.837598,12.98277 -0.837598,26.38434 0,24.70914 7.119583,39.36711 7.538382,14.23916 16.751962,14.23916 z"
+				fill="#28B80F"/>
+				<ellipse
+				cx="249.5977"
+				cy="286.44006"
+				rx="24.914482"
+				ry="24.210186"
+				fill="currentColor"
+					/>
+			</svg>
+			<span class="fs-4">Sample Project</span>
+		</span>
+	</header>
+	<div class="row g-5">
+		<div class="col-md-8">
+			<main class="row">
+				<header>
+					<h1 class="mt-2">Someone's Website</h1>
+					<p class="mb-4">Designing a website for crazy people wanting to live a life they&#x2019;ve like.</p>
+					<hr/>
+				</header>
+				<section class="col-12 col-md-4">
+					<h4 class="mb-3">Project Summary</h4>
+					<div class="rte_small-type w-richtext">
+						<h5>Project Type</h5>
+						<p>Web Dev</p>
+						<h5>My Role</h5>
+						<p>Project Lead</p>
+						<h5>Timeframe</h5>
+						<p>Over several months in 2017-2018</p>
+						<h5>Company</h5>
+						<p>YoSpace</p>
+						<h5>Team Members<br/></h5>
+						<p>The YoSpace team included UX designers, Project Managers, Account Managers, Creative Directors, Design Directors, plus an external agency who managed the development of the site. </p>
+					</div>
+				</section>
+				<article class="col-12 col-md-8">
+					<h4 class="mb-3">Project Details</h4>
+					<p>Someone's website Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Morbi leo urna molestie at elementum eu facilisis. Eu scelerisque felis imperdiet proin fermentum leo vel orci porta. Aliquam faucibus purus in massa tempor nec. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Nibh cras pulvinar mattis nunc. Nisl rhoncus mattis rhoncus urna neque viverra justo. Sem integer vitae justo eget magna fermentum iaculis eu non. Ac orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Commodo sed egestas egestas fringilla phasellus faucibus.</p>
+					<p>Amet est placerat in egestas erat imperdiet sed euismod. Orci dapibus ultrices in iaculis nunc. Imperdiet sed euismod nisi porta. Porta non pulvinar neque laoreet suspendisse interdum. Enim tortor at auctor urna nunc. Iaculis urna id volutpat lacus laoreet non curabitur. Justo laoreet sit amet cursus. Elementum tempus egestas sed sed risus pretium quam vulputate. Ipsum dolor sit amet consectetur. Aliquam id diam maecenas ultricies mi eget. Est placerat in egestas erat. Faucibus ornare suspendisse sed nisi lacus. Faucibus vitae aliquet nec ullamcorper sit amet risus nullam. Commodo quis imperdiet massa tincidunt nunc. Adipiscing tristique risus nec feugiat in fermentum posuere. Nibh nisl condimentum id venenatis a condimentum vitae sapien pellentesque. Ipsum faucibus vitae aliquet nec ullamcorper. Curabitur vitae nunc sed velit dignissim. Mauris augue neque gravida in fermentum. Commodo viverra maecenas accumsan lacus vel facilisis volutpat.</p>
+				</article>
+			</main>
+			<main class="row bg-secondary mb-3">
+				<div class="container w-75 mx-auto my-5">
+					<h5>Project Objective</h5>
+					<blockquote class="lead">Build a new responsive website that prioritizes the users and their needs and complies with all accessibility and legal requirements.</blockquote>
+				</div>
+			</main>
+			<main class="row">
+				<section class="col-12 col-md-4">
+					<h4 class="mb-3">Prototyping -<br/>Scope &amp; Limitation</h4>
+				</section>
+				<article class="col-12 col-md-8">
+					<h4 class="mb-3">Project Details</h4>
+					<p>Someone's website Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Morbi leo urna molestie at elementum eu facilisis. Eu scelerisque felis imperdiet proin fermentum leo vel orci porta. Aliquam faucibus purus in massa tempor nec. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Nibh cras pulvinar mattis nunc. Nisl rhoncus mattis rhoncus urna neque viverra justo. Sem integer vitae justo eget magna fermentum iaculis eu non. Ac orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Commodo sed egestas egestas fringilla phasellus faucibus.</p>
+					<p>Amet est placerat in egestas erat imperdiet sed euismod. Orci dapibus ultrices in iaculis nunc. Imperdiet sed euismod nisi porta. Porta non pulvinar neque laoreet suspendisse interdum. Enim tortor at auctor urna nunc. Iaculis urna id volutpat lacus laoreet non curabitur. Justo laoreet sit amet cursus. Elementum tempus egestas sed sed risus pretium quam vulputate. Ipsum dolor sit amet consectetur. Aliquam id diam maecenas ultricies mi eget. Est placerat in egestas erat. Faucibus ornare suspendisse sed nisi lacus. Faucibus vitae aliquet nec ullamcorper sit amet risus nullam. Commodo quis imperdiet massa tincidunt nunc. Adipiscing tristique risus nec feugiat in fermentum posuere. Nibh nisl condimentum id venenatis a condimentum vitae sapien pellentesque. Ipsum faucibus vitae aliquet nec ullamcorper. Curabitur vitae nunc sed velit dignissim. Mauris augue neque gravida in fermentum. Commodo viverra maecenas accumsan lacus vel facilisis volutpat.</p>
+				</article>
+				<div id="img_carousel" class="carousel slide" data-bs-ride="carousel">
+					<div class="carousel-indicators">
+					<button type="button" data-bs-target="#img_carousel" data-bs-slide-to="0" aria-label="Slide 1" class="active" aria-current="true"></button>
+					<button type="button" data-bs-target="#img_carousel" data-bs-slide-to="1" aria-label="Slide 2" class="" ></button>
+					<button type="button" data-bs-target="#img_carousel" data-bs-slide-to="2" aria-label="Slide 3" class=""></button>
+					</div>
+					<div class="carousel-inner">
+					<figure class="carousel-item active">
+						<svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100 border" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><text x="50%" y="50%" fill="#555" dy=".3em">First slide</text></svg>
+					</figure>
+					<figure class="carousel-item">
+						<svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100 border" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Second slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><text x="50%" y="50%" fill="#444" dy=".3em">Second slide</text></svg>
+					</figure>
+					<figure class="carousel-item">
+						<svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100 border" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Third slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><text x="50%" y="50%" fill="#333" dy=".3em">Third slide</text></svg>
+					</figure>
+					</div>
+					<button class="carousel-control-prev" type="button" data-bs-target="#img_carousel" data-bs-slide="prev">
+					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					<span class="visually-hidden">Previous</span>
+					</button>
+					<button class="carousel-control-next" type="button" data-bs-target="#img_carousel" data-bs-slide="next">
+					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+					<span class="visually-hidden">Next</span>
+					</button>
+				</div>
+			</main>
+		</div>
+		<div class="col-md-4">
+			<div class="position-sticky" style="top: 2rem;">
+				<div class="p-4 mb-3 bg-white">
+				<h4 class="fst-italic">About</h4>
+				<p class="mb-0">Customize this section to tell your visitors a little bit about your publication, writers, content, or something else entirely. Totally up to you.</p>
+				</div>
+
+				<div class="p-4">
+				<h4 class="fst-italic">Archives</h4>
+				<ol class="list-unstyled mb-0">
+					<li><a href="#">March 2021</a></li>
+					<li><a href="#">February 2021</a></li>
+					<li><a href="#">January 2021</a></li>
+					<li><a href="#">December 2020</a></li>
+					<li><a href="#">November 2020</a></li>
+					<li><a href="#">October 2020</a></li>
+					<li><a href="#">September 2020</a></li>
+					<li><a href="#">August 2020</a></li>
+					<li><a href="#">July 2020</a></li>
+					<li><a href="#">June 2020</a></li>
+					<li><a href="#">May 2020</a></li>
+					<li><a href="#">April 2020</a></li>
+				</ol>
+				</div>
+
+				<div class="p-4">
+				<h4 class="fst-italic">Elsewhere</h4>
+				<ol class="list-unstyled">
+					<li><a href="#">GitHub</a></li>
+					<li><a href="#">Twitter</a></li>
+					<li><a href="#">Facebook</a></li>
+				</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer class="pt-5 my-5 text-muted border-top">
+		Published Feb 2023
+	</footer>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		// var carouselSlide = new bootstrap.Carousel(document.querySelector('#img_carousel'), {
+		// interval: 1000,
+		// wrap: false
+		// });
+	});
+</script>
+<style>
+	@media (prefers-reduced-motion: reduce){
+		.carousel-item{
+			transition:transform .6s ease-in-out
+		}
+		.carousel-control-next,.carousel-control-prev{
+			transition:all
+		}
+		.carousel-fade .active.carousel-item-end,.carousel-fade .active.carousel-item-start{
+			transition:all
+		}
+		.carousel-indicators [data-bs-target]{
+			transition:opacity .6s ease
+		}
+		.progress-bar-animated {
+			-webkit-animation: 1s linear infinite progress-bar-stripes;
+			animation: 1s linear infinite progress-bar-stripes;
+		}
+	}
+</style>
+</body>
+</html>
