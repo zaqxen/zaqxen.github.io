@@ -1,8 +1,6 @@
 ## My Portfolio
 # Mark Morgan Miranda
 ---
-https://www.michelleovalle.com/national-flood-insurance-program
-https://www.michelleovalle.com/work
 
 > Install Virtual Environment:
 - pip install virtualenv
@@ -38,7 +36,9 @@ https://www.michelleovalle.com/work
 ---
 > How to print the location
 
-``` print("\033[m\033[0;30;47m LOCATION--► \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : def " + sys._getframe(0).f_code.co_name + "\033[m")```
+``` print("\033[m\033[0;30;47m File \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : def " + sys._getframe(0).f_code.co_name + "\033[m")```
+
+This format is tested to work on Ubuntu, Windows and, Mac having the File followed by path makes it clickable and directly jump to the location 
 
 <https://www.instructables.com/Printing-Colored-Text-in-Python-Without-Any-Module/>
 ```
@@ -56,9 +56,9 @@ print(f"\u001b]8;;{__file__}:140\u001b\\{'TRANSACTION LIMIT ORDER BEGINS'}\u001b
 
 import sys,inspect
 
-print("\033[m\033[0;30;47m LOCATION--► \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : def " + sys._getframe(0).f_code.co_name + "\033[m")
-print("\033[m\033[0;37;41m LOCATION--► \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : def " + sys._getframe(0).f_code.co_name + "\033[m")
-print("\033[m\033[0;37;41m ExERR:--► \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : " + sys._getframe(0).f_code.co_name+"("+ str(format(sys.exc_info()[-1].tb_lineno))+")")
+print("\033[m\033[0;30;47m File \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : def " + sys._getframe(0).f_code.co_name + "\033[m")
+print("\033[m\033[0;37;41m File \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : def " + sys._getframe(0).f_code.co_name + "\033[m")
+print("\033[m\033[0;37;41m File \""+ f"{__file__}\", line " + str(inspect.currentframe().f_lineno) + " : " + sys._getframe(0).f_code.co_name+"("+ str(format(sys.exc_info()[-1].tb_lineno))+")")
 ```
 ---
 Text color | Code | Text style | Code | Background color | Code
@@ -79,3 +79,4 @@ White | 37 | |  | White | 47
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 ```
+It is just those times you know you can do it but simply want to copy paste and make few tweaks 😊
