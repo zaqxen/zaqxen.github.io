@@ -1,292 +1,216 @@
-<!-- <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en"> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<meta name="color-scheme" content="dark">
-	<meta name="description" content=""/>
-	<meta name="author" content="Mark Morgan Miranda"/>
-	<!-- <base target="_blank"> -->
-	<title>Mark Morgan Miranda</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"/>
-	<link rel="icon" href="assets/media/favicon.svg"/>
-	<link rel="mask-icon" href="assets/media/favicon.svg" color="#000000"/>
-	<link rel="apple-touch-icon" href="assets/media/m.png"/>
-	<style>
-		:root{
-			/* --primary:#002200;
-			--secondary:#e2e9e3;
-			--accent:#008800; */
-
-			--primary:#e2e9e3;
-			--secondary:#002200;
-			--accent:#008800;
-
-			--green:#28B80F; /* Greenest Green */
-
-			/* Minimal Color Pallete */
-			/* --g0:hsl(120, 100%, 27%);
-			--g1:hsl(120, 100%, 7%);
-			--g2:hsl(0, 0%, 100%);
-			--g3:hsl(0, 0%, 100%); */
-			/* color-scheme: light dark; /* both supported */
-			color-scheme: light;
-			--bs-border-color:#008800;
-		}
-		@font-face {
-			font-family: 'Lexend Exa';
-			src: font-url('assests/fonts/LexendExa-VariableFont_wght.ttf') format('ttf'),font-url('LexendExa-VariableFont_wght.ttf') format('ttf');
-		}
-		@font-face {
-			font-family: 'Lexend';
-			src: font-url('assests/fonts/Lexend-VariableFont_wght.ttf') format('ttf'),font-url('Lexend-VariableFont_wght.ttf') format('ttf');
-		}
-		@font-face {
-			font-family: 'Noto Sans Tagalog';
-			src: font-url('assests/fonts/NotoSansTagalog-Regular') format('ttf'),font-url('NotoSansTagalog-Regular') format('ttf');
-		}
-		body{
-			font-family: 'Lexend','Noto Sans Tagalog',Arial ,Verdana ,Tahoma ,'Trebuchet MS', sans-serif;
-			font-weight: 300;
-			background-color: var(--primary);
-			/* color:var(--primary); */
-		}
-		a{
-			text-decoration: none;
-			color: inherit;
-		}
-
-		.bd-placeholder-img {
-			font-size: 1.125rem;
-			text-anchor: middle;
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			user-select: none;
-		}
-
-		@media (min-width: 768px) {
-			.bd-placeholder-img-lg {
-			font-size: 3.5rem;
-			}
-		}
-
-		.b-example-divider {
-			height: 3rem;
-			background-color: rgba(0, 0, 0, .1);
-			border: solid rgba(0, 0, 0, .15);
-			border-width: 1px 0;
-			box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
-		}
-
-		.b-example-vr {
-			flex-shrink: 0;
-			width: 1.5rem;
-			height: 100vh;
-		}
-
-		.bi {
-			vertical-align: -.125em;
-			fill: currentColor;
-		}
-
-		.nav-scroller {
-			position: relative;
-			z-index: 2;
-			height: 2.75rem;
-			overflow-y: hidden;
-		}
-
-		.nav-scroller .nav {
-			display: flex;
-			flex-wrap: nowrap;
-			padding-bottom: 1rem;
-			margin-top: -1px;
-			overflow-x: auto;
-			text-align: center;
-			white-space: nowrap;
-			-webkit-overflow-scrolling: touch;
-		}
-		/* Light mode */
-		/* @media (prefers-color-scheme: light) { */
-			/* body{
-				background-color: var(--secondary);
-				color:var(--primary);
-			} */
-			.icon-list li::before {
-				background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z'/%3E%3C/svg%3E") no-repeat center center / 100% auto;
-			}
-		/* } */
-		/* Dark mode */
-		/* @media (prefers-color-scheme: dark) {
-			body{
-				background-color: var(--g1);
-				color:#fff;
-			}
-			.text-muted, .text-muted *{
-				filter: brightness(4)!important;
-				opacity: 1.0!important;
-			}
-			.icon-list li::before {
-				background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z'/%3E%3C/svg%3E") no-repeat center center / 100% auto;
-			}
-		} */
-	</style>
-	<style>
-		/* replace bullets with circle right arrow */
-		.icon-list li::before {
-			display: block;
-			flex-shrink: 0;
-			width: 1.5em;
-			height: 1.5em;
-			margin-right: .5rem;
-			content: "";
-		}
-	</style>
-	<script>
-		function includeHTML() {
-			let z, i, elmnt, html_file, xhttp;
-			z = document.getElementsByTagName("template");
-			for (i = 0; i < z.length; i++) {
-			elmnt = z[i];
-			html_file = elmnt.getAttribute("include-html");
-			if (html_file) {
-				console.log(1)
-				xhttp = new XMLHttpRequest();
-				xhttp.onreadystatechange = function() {
-				if (this.readyState == 4) {
-					console.log(2)
-					if (this.status == 200) {
-						console.log(3)
-						let newProject = document.createElement("div");
-						newProject.classList.add("include");
-						newProject.id = html_file;
-						newProject.innerHTML = this.responseText;
-						elmnt.insertAdjacentElement("afterend", newProject);
-					}
-					if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
-					elmnt.remove();
-					includeHTML();
-					console.log(4)
-				}
-				}
-				xhttp.open("GET", html_file, true);
-				xhttp.send();
-				return;
-			}
-			}
-		};
-	</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ajman Bus Schedule</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body { background: #f8f9fa; }
+    .highlight { background: #ffc107 !important; color: #000; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    .next-bus-card {
+      border-radius: 6px;
+      padding: 0.75rem;
+      text-align: center;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .next-bus-card h6 { margin-bottom: 0.25rem; font-size: 1rem; }
+    .status-red { background: #dc3545; }
+    .status-orange { background: #fd7e14; }
+    .status-yellow { background: #ffc107; color: #000; }
+    .status-green { background: #28a745; }
+    .status-blue { background: #007bff; }
+    .collapse td { background: #fdfdfd; }
+    .table td, .table th { vertical-align: middle; }
+  </style>
 </head>
-<body class="container">
-	<header class="d-flex align-items-center pb-3 mt-2 mb-5 border-bottom">
-		<a href="/" class="d-flex align-items-center text-decoration-none" >
-			<!-- <svg
-				width="40"
-				height="32"
-				viewBox="0, 0, 400,332.427843803056"
-				version="1.1"
-				xmlns="http://www.w3.org/2000/svg"
-				xmlns:svg="http://www.w3.org/2000/svg">
-				<g transform="matrix(0.99777182,0,0,0.99944802,-2.0995437,0.09925547)">
-				<path
-					d="m 306.66655,48.752995 c -45.73,5.73 -73.25833,45.14522 -88.49833,78.995215 l -104.11569,5.19706 C 113.85259,108.80514 104.3917,90.923549 95.311703,83.053549 79.410919,70.275472 59.073858,74.665317 43.253858,79.935317 c -5.03,1.67 -18.239667,7.775286 -17.699667,8.315286 55.51,-3.46 72.089049,23.895497 57.263629,55.088767 l -31.234707,59.24642 c -19.356802,44.92377 15.602064,86.67696 46.852061,93.54696 0,0 45.066286,8.70962 90.580646,-36.37937 16.24105,-18.87679 26.49091,-34.89286 45.81091,-83.15286 11.68,-29.17 12.21198,-29.30349 19.78198,-46.77349 6.53,-15.08 18.91521,-36.970016 36.44049,-46.773481 73.52852,-28.951734 67.34206,48.485811 46.85206,77.955811 0,0 25.07471,-19.70113 31.23471,-50.93113 6.71,-34.010001 -20.79942,-65.525235 -62.46942,-61.325235 M 202.55086,176.60052 c 0,0 -25.13437,57.71875 -48.93437,72.75875 -17.88205,15.03013 -39.91132,21.38411 -55.181316,10.39411 -13.699739,-10.06064 -23.661569,-24.60877 -10.411569,-55.08877 20.379995,-41.41 10.664298,-21.76643 21.864295,-41.57643 l 98.9099,-4.15765"
-					stroke="none"
-					fill="#28B80F"
-					fill-rule="evenodd" />
-				</g>
-				<ellipse
-					fill="currentColor"
-					cx="172.21774"
-					cy="60.582794"
-					rx="24.914482"
-					ry="24.210186" />
-				<ellipse
-					fill="currentColor"
-					cx="249.5977"
-					cy="286.44006"
-					rx="24.914482"
-					ry="24.210186" />
-			</svg> -->
-			<svg
-			viewBox="0 0 400 320"
-			height="32"
-			version="1.1"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlns:svg="http://www.w3.org/2000/svg">
-				<ellipse
-				cx="172.21774"
-				cy="60.582794"
-				rx="24.914482"
-				ry="24.210186"
-				id="ellipse6" />
-				<path
-				d="m 112.07826,295.86243 q -25.546741,0 -41.042305,-22.19635 -15.076764,-22.61515 -15.076764,-60.72586 0,-15.07676 0.837598,-26.38434 1.256397,-11.30757 2.931593,-23.45274 2.512794,-17.17076 5.025588,-27.64073 2.512794,-10.88878 2.512794,-21.35875 H 0.67772134 V 85.625323 H 54.283995 q 22.196347,0 33.503921,5.025588 11.726372,4.606789 11.726372,25.546739 0,5.44439 -0.418799,9.63238 -0.418799,4.18799 -1.256397,7.11958 13.401568,-4.18799 28.897128,-5.86318 15.91437,-1.6752 25.96554,-1.6752 21.77755,0 39.78591,4.60679 18.00836,4.60679 32.66632,11.72637 4.18799,-5.86319 10.88878,-16.75196 7.11958,-10.88877 22.19634,-35.179117 19.26476,-30.991127 36.85432,-45.230293 18.00835,-14.239166 43.13629,-14.239166 21.77755,0 37.27312,11.307573 15.91436,11.307573 23.87154,30.991127 l -26.38434,11.307573 q -5.44438,-14.239166 -15.07676,-19.683553 -9.21358,-5.444388 -21.35875,-5.444388 -14.23917,0 -26.38434,10.051177 -11.72637,10.051176 -26.38434,33.922717 -20.93995,35.17912 -33.92272,56.95667 -12.98277,21.35875 -21.35875,34.76032 -7.95718,13.40156 -15.49556,24.29034 -13.82037,20.52115 -29.73473,38.11071 -15.91436,17.58956 -33.50392,28.47833 -17.58956,10.46998 -37.69191,10.46998 z m 0,-28.47834 q 15.91436,0 31.82872,-13.40156 16.33316,-13.40157 32.66633,-36.01672 16.75196,-23.03394 33.92272,-51.93108 -12.98277,-5.86318 -28.89714,-8.79478 -15.49556,-3.35039 -30.15352,-3.35039 -15.49557,0 -30.57233,2.9316 -15.07677,2.51279 -28.478335,7.11958 -2.093995,10.46997 -3.350392,23.45274 -0.837598,12.98277 -0.837598,26.38434 0,24.70914 7.119583,39.36711 7.538382,14.23916 16.751962,14.23916 z"
-				fill="#28B80F"/>
-				<ellipse
-				cx="249.5977"
-				cy="286.44006"
-				rx="24.914482"
-				ry="24.210186"
-					/>
-			</svg>
-			<span class="fs-4">Sample Project</span>
-		</a>
-	</header>
-	<main class="row g-5">
-		<article class="col-md-8">
-			<template include-html="article1.html"></template>
-			<template include-html="article2.html"></template>
-		</article>
-		<aside class="col-md-4">
-			<div class="position-sticky top-0 pt-2">
-				<!-- <div class="p-4 mb-3 text-bg-light rounded">
-				<h4 class="fst-italic">About</h4>
-				<p class="mb-0">Customize this section to tell your visitors a little bit about your publication, writers, content, or something else entirely. Totally up to you.</p>
-				</div> -->
-				<div class="p-4">
-				<h4 class="fst-italic">Projects</h4>
-					<ol class="list-unstyled mb-0">
-						<li><a href="#article1.html">March 2021</a></li>
-						<li><a href="#article2.html">February 2021</a></li>
-						<li><a href="#">January 2021</a></li>
-						<li><a href="#">December 2020</a></li>
-						<li><a href="#">November 2020</a></li>
-						<li><a href="#">October 2020</a></li>
-						<li><a href="#">September 2020</a></li>
-						<li><a href="#">August 2020</a></li>
-						<li><a href="#">July 2020</a></li>
-						<li><a href="#">June 2020</a></li>
-						<li><a href="#">May 2020</a></li>
-						<li><a href="#">April 2020</a></li>
-					</ol>
-				</div>
+<body>
 
-				<div class="p-4">
-				<h4 class="fst-italic">Social Media</h4>
-				<ol class="list-unstyled">
-					<li><a target="_blank" rel="noopener noreferrer external nofollow" href="https://zaqxen.github.io">GitHub</a></li>
-					<li><a target="_blank" rel="noopener noreferrer external nofollow" href="https://twitter.com/zaqxen">Twitter</a></li>
-					<li><a target="_blank" rel="noopener noreferrer external nofollow" href="https://www.facebook.com/zaqxen">Facebook</a></li>
-					<li><a target="_blank" rel="noopener noreferrer external nofollow" href="https://www.linkedin.com/in/markmorganmiranda/">Linkedin</a></li>
-					<li><a target="_blank" rel="noopener noreferrer external nofollow" href="https://stackoverflow.com/users/8348934/mark-morgan-miranda">Stackoverflow</a></li>
-				</ol>
-				</div>
-			</div>
-		</aside>
-	</main>
-	<footer class="pt-5 my-5 text-muted border-top">
-		Published February 2023
-	</footer>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+<div class="container my-4">
+  <h2 class="text-center mb-4">🚌 Ajman Bus Schedule</h2>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			includeHTML();
-		});
-	</script>
+  <!-- Per-Line Dashboard -->
+  <div id="dashboard" class="dashboard"></div>
+
+  <!-- Bus Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Bus Line</th>
+          <th>Destination</th>
+          <th>Cash Fare</th>
+          <th>Masar Card</th>
+          <th>Schedule</th>
+        </tr>
+      </thead>
+      <tbody id="bus-table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // === DATA ===
+  const routes = [
+    { line: "Al Ain (AUD)", destination: "Al Ain", fareCash: "35 AED", fareMasar: "35 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["08:00","12:00","16:00","20:00"] }] },
+    { line: "Abu Dhabi (AUD)", destination: "Abu Dhabi", fareCash: "35 AED", fareMasar: "35 AED",
+      schedules: [
+        { title: "From Al Musalla Station", link: "#", times: ["07:00","11:00","15:00","19:00"] },
+        { title: "From Abu Dhabi Main Bus Station", link: "#", times: ["07:00","11:00","15:00","19:00"] }
+      ] },
+    { line: "Ras Al Khaimah", destination: "Ras Al Khaimah", fareCash: "25 AED", fareMasar: "N/A",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["07:30","09:30","11:30","13:30","15:30","17:30","19:30","21:30"] }] },
+    { line: "Al Jurf (AJ1)", destination: "Al Jurf", fareCash: "5 AED", fareMasar: "5 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["06:00","06:30","07:00","07:15","07:30","07:45","08:15","08:45","09:00","09:15","09:30","09:45","10:15","10:45","11:00","11:15","11:30","12:00","12:15","12:30","12:45","13:00","13:30","13:45","14:15","14:45","15:15","15:30","16:00","16:15","16:45","17:00","17:15","17:45","18:00","18:15","18:30","18:45","19:15","19:30","19:45","20:00","20:30","20:45","21:00","21:30","21:45","22:10","22:50","23:20"] }] },
+    { line: "Industrial (AJ2)", destination: "Industrial Area", fareCash: "5 AED", fareMasar: "5 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["06:00","06:20","06:40","07:00","07:20","07:40","08:00","08:20","08:40","09:00","09:20","09:40","10:00","10:25","10:50","11:15","11:40","12:10","12:30","12:50","13:10","13:30","13:50","14:15","14:40","15:00","15:20","15:40","16:00","16:20","16:40","17:00","17:25","17:50","18:10","18:40","19:05","19:25","19:50","20:10","20:30","20:50","21:15","21:35","21:55","22:15","22:40","23:05"] }] },
+    { line: "Hamidiya (AJ3)", destination: "Al Hamidiya", fareCash: "5 AED", fareMasar: "5 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["06:00","06:20","06:40","07:00","07:15","07:30","07:50","08:10","08:30","09:00","09:20","09:40","10:00","10:30","10:50","11:10","11:30","12:00","12:20","12:40","13:00","13:30","14:30","15:30","16:00","16:30","16:50","17:10","17:30","18:00","18:20","18:40","19:00","19:30","19:50","20:10","20:30","21:00","21:20","21:40","22:00","22:30","22:50","23:10"] }] },
+    { line: "Sharjah (SHJ1)", destination: "Sharjah", fareCash: "9 AED", fareMasar: "9 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["06:00","06:20","06:40","07:00","07:20","07:40","08:00","08:20","08:40","09:00","09:20","09:40","10:00","10:20","10:40","11:00","11:20","11:40","12:00","12:20","12:40","13:00","13:20","13:40","14:00","14:20","14:40","15:00","15:20","15:40","16:00","16:20","16:40","17:00","17:20","17:40","18:00","18:20","18:40","19:00","19:20","19:40","20:00","20:20","20:40","21:00","21:20","21:40","22:00","22:20","22:40","23:00"] }] },
+    { line: "Centrepoint (DXB1)", destination: "Rashidiya Metro", fareCash: "15 AED", fareMasar: "15 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["05:45","06:15","06:45","07:15","07:45","08:15","08:45","09:15","09:45","10:15","10:45","11:15","11:45","12:15","12:45","13:15","13:45","14:15","14:45","15:15","15:45","16:15","16:45","17:15","17:45","18:15","18:45","19:15","19:45","20:15","20:45","21:15","21:45","22:15","22:45"] }] },
+    { line: "Umm Al Quwain (UAQ)", destination: "Umm Al Quwain", fareCash: "15 AED", fareMasar: "15 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"] }] },
+    { line: "Sheikh Ammar St. (AJ6)", destination: "Sheikh Ammar St.", fareCash: "5 AED", fareMasar: "5 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["06:00","06:25","06:50","07:15","07:45","08:10","08:35","09:00","09:30","09:55","10:20","10:45","11:15","11:40","12:05","12:30","13:00","13:25","13:50","14:15","14:45","15:10","15:35","16:00","16:30","16:55","17:20","17:45","18:15","18:40","19:05","19:30","20:00","20:25","20:50","21:15","21:45","22:10","22:35","23:00"] }] },
+    { line: "Mushairef (AJ7)", destination: "Al Mushairef", fareCash: "5 AED", fareMasar: "5 AED",
+      schedules: [{ title: "From Al Musalla Station", link: "#", times: ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"] }] },
+    { line: "Hamidiya Feeder", destination: "ADNOC Al Muntazi", fareCash: "3 AED", fareMasar: "3 AED",
+      schedules: [{ title: "From ADNOC Al Muntazi", link: "#", times: ["06:00","06:45","07:30","08:15","09:00","09:45","10:30","11:15","12:00","12:45","13:30","14:15","15:45","16:30","17:15","18:00","18:45","19:30","20:15","21:00","21:45","22:30","23:15","23:50"] }] },
+    // ✅ MERGED Global Village
+    { line: "Global Village", destination: "Global Village", fareCash: "25 AED", fareMasar: "25 AED",
+      schedules: [
+        { title: "Weekday - From Al Musalla Station", link: "#", times: ["14:15","16:45","18:15"] },
+        { title: "Weekday - From Global Village", link: "#", times: ["15:45","22:30","00:30"] },
+        { title: "Weekend - From Al Musalla Station", link: "#", times: ["14:15","16:45","18:45"] },
+        { title: "Weekend - From Global Village", link: "#", times: ["15:45","22:30","01:30"] }
+      ] }
+  ];
+
+  // === UTILS ===
+  function parseTimeToDate(timeStr) {
+    const [h, m] = timeStr.split(":").map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+
+  function minutesDiff(a, b) {
+    return Math.round((a - b) / 60000);
+  }
+
+  function statusClass(diff) {
+    if (diff <= 15) return "status-red";
+    if (diff <= 30) return "status-orange";
+    if (diff <= 60) return "status-yellow";
+    if (diff > 60) return "status-green";
+    return "status-blue";
+  }
+
+  function isWeekend() {
+    const day = new Date().getDay(); // 0=Sun, 5=Fri, 6=Sat
+    return day === 5 || day === 6;
+  }
+
+  // === RENDER TABLE ===
+  const tbody = document.getElementById("bus-table-body");
+  routes.forEach((route, i) => {
+    const id = "collapse-" + i;
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td>${route.line}</td>
+        <td>${route.destination}</td>
+        <td>${route.fareCash}</td>
+        <td>${route.fareMasar}</td>
+        <td><button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#${id}">View Times</button></td>
+      </tr>
+      <tr class="collapse" id="${id}">
+        <td colspan="5">
+          ${route.schedules.map(s => `
+            <strong>${s.title}:</strong> <a href="${s.link}" target="_blank">Click here</a><br>
+            <span class="times" data-line="${route.line}">${s.times.join(", ")}</span><br><br>
+          `).join("")}
+        </td>
+      </tr>
+    `);
+  });
+
+  // === RENDER DASHBOARD ===
+  const dashboard = document.getElementById("dashboard");
+  routes.forEach(route => {
+    dashboard.insertAdjacentHTML("beforeend", `
+      <div class="next-bus-card" id="card-${route.line.replace(/\W+/g,"-")}">
+        <h6>${route.line}</h6>
+        <p class="next-time">Loading...</p>
+      </div>
+    `);
+  });
+
+  // === FIND NEXT BUS PER LINE ===
+  function findNextPerLine() {
+    const now = new Date();
+    routes.forEach(route => {
+      let closest = null;
+
+      // Special handling for Global Village
+      const validSchedules = route.line.includes("Global Village")
+        ? route.schedules.filter(s => isWeekend() ? s.title.includes("Weekend") : s.title.includes("Weekday"))
+        : route.schedules;
+
+      validSchedules.forEach(s => {
+        s.times.forEach(time => {
+          const d = parseTimeToDate(time);
+          if (d > now && (!closest || d < closest)) closest = d;
+        });
+      });
+
+      const card = document.querySelector(`#card-${route.line.replace(/\W+/g,"-")}`);
+      const label = card.querySelector(".next-time");
+
+      if (closest) {
+        const diff = minutesDiff(closest, now);
+        card.className = `next-bus-card ${statusClass(diff)}`;
+        label.textContent = `Next at ${closest.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} (${diff} min)`;
+      } else {
+        card.className = "next-bus-card status-blue";
+        label.textContent = "No more buses today";
+      }
+    });
+  }
+
+  function highlightUpcoming() {
+    const now = new Date();
+    document.querySelectorAll(".times").forEach(el => {
+      const times = el.innerText.split(",").map(t => t.trim());
+      let highlighted = false;
+      el.innerHTML = times.map(time => {
+        const d = parseTimeToDate(time);
+        if (!highlighted && d > now) {
+          highlighted = true;
+          return `<span class="highlight">${time}</span>`;
+        }
+        return time;
+      }).join(", ");
+    });
+  }
+
+  // Init
+  findNextPerLine();
+  highlightUpcoming();
+  setInterval(() => {
+    findNextPerLine();
+    highlightUpcoming();
+  }, 60000);
+</script>
 </body>
-
 </html>
