@@ -29,6 +29,53 @@
     .status-blue { background: #007bff; }
     .collapse td { background: #fdfdfd; }
     .table td, .table th { vertical-align: middle; }
+	
+	/* === Dashboard as compact stacked stripes === */
+.dashboard {
+  display: block;     /* no grid on mobile */
+  margin: 0;
+  padding: 0;
+  gap: 0;             /* kill gap */
+}
+
+.next-bus-card {
+  border-radius: 0;   /* no rounded edges */
+  padding: 2px 6px;   /* thin padding */
+  margin: 0;          /* no margins */
+  text-align: left;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.next-bus-card h6 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.next-bus-card p {
+  margin: 0;          /* kill default p margin */
+  padding: 0;
+}
+
+/* Keep desktop grid view */
+@media (min-width: 769px) {
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .next-bus-card {
+    border-radius: 6px;
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  .next-bus-card h6 {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -37,7 +84,7 @@
   <h2 class="text-center mb-4">🚌 Ajman Bus Schedule</h2>
 
   <!-- Per-Line Dashboard -->
-  <div id="dashboard" class="dashboard"></div>
+  <div id="dashboard" class="dashboard mb-3"></div>
 
   <!-- Bus Table -->
   <div class="table-responsive">
@@ -48,7 +95,7 @@
           <th>Destination</th>
           <th>Cash Fare</th>
           <th>Masar Card</th>
-          <th>Schedule</th>
+          <th class="d-none d-md-table-cell">Schedule</th>
         </tr>
       </thead>
       <tbody id="bus-table-body"></tbody>
@@ -123,70 +170,108 @@
   }
 
   // === RENDER TABLE ===
-  const tbody = document.getElementById("bus-table-body");
-  routes.forEach((route, i) => {
-    const id = "collapse-" + i;
-    tbody.insertAdjacentHTML("beforeend", `
-      <tr>
-        <td>${route.line}</td>
-        <td>${route.destination}</td>
-        <td>${route.fareCash}</td>
-        <td>${route.fareMasar}</td>
-        <td><button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#${id}">View Times</button></td>
-      </tr>
-      <tr class="collapse" id="${id}">
-        <td colspan="5">
-          ${route.schedules.map(s => `
-            <strong>${s.title}:</strong> <a href="${s.link}" target="_blank">Click here</a><br>
-            <span class="times" data-line="${route.line}">${s.times.join(", ")}</span><br><br>
-          `).join("")}
-        </td>
-      </tr>
-    `);
-  });
+	const tbody = document.getElementById("bus-table-body");
+	routes.forEach((route, i) => {
+	  const id = "collapse-" + i;
+	  tbody.insertAdjacentHTML("beforeend", `
+		<tr class="clickable-row" data-bs-target="#${id}">
+		  <td>${route.line}</td>
+		  <td>${route.destination}</td>
+		  <td>${route.fareCash}</td>
+		  <td>${route.fareMasar}</td>
+		  <td class="d-none d-md-table-cell">
+			<button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#${id}">
+			  View Times
+			</button>
+		  </td>
+		</tr>
+		<tr class="collapse" id="${id}">
+		  <td colspan="5">
+			${route.schedules.map(s => `
+			  <strong>${s.title}:</strong> <a href="${s.link}" target="_blank">Click here</a><br>
+			  <span class="times" data-line="${route.line}">${s.times.join(", ")}</span><br><br>
+			`).join("")}
+		  </td>
+		</tr>
+	  `);
+	});
+
+
 
   // === RENDER DASHBOARD ===
   const dashboard = document.getElementById("dashboard");
-  routes.forEach(route => {
-    dashboard.insertAdjacentHTML("beforeend", `
-      <div class="next-bus-card" id="card-${route.line.replace(/\W+/g,"-")}">
-        <h6>${route.line}</h6>
-        <p class="next-time">Loading...</p>
-      </div>
-    `);
-  });
+
+	// Desktop = card grid
+	const desktopContainer = document.createElement("div");
+	desktopContainer.className = "dashboard d-none d-md-grid";
+
+	routes.forEach(route => {
+	  desktopContainer.insertAdjacentHTML("beforeend", `
+		<div class="next-bus-card" id="card-${route.line.replace(/\W+/g,"-")}">
+		  <h6>${route.line}</h6>
+		  <p class="next-time">Loading...</p>
+		</div>
+	  `);
+	});
+
+	// Mobile = list group
+	const mobileList = document.createElement("ul");
+	mobileList.className = "list-group d-md-none";
+
+	routes.forEach(route => {
+	  mobileList.insertAdjacentHTML("beforeend", `
+		<li class="list-group-item text-white" id="list-${route.line.replace(/\W+/g,"-")}" style="text-align:center">
+		  <strong>${route.line}</strong> —
+		  <nobr class="next-time">Loading...</nobr>
+		</li>
+	  `);
+	});
+
+	dashboard.appendChild(desktopContainer);
+	dashboard.appendChild(mobileList);
+
 
   // === FIND NEXT BUS PER LINE ===
   function findNextPerLine() {
-    const now = new Date();
-    routes.forEach(route => {
-      let closest = null;
+  const now = new Date();
+  routes.forEach(route => {
+    let closest = null;
 
-      // Special handling for Global Village
-      const validSchedules = route.line.includes("Global Village")
-        ? route.schedules.filter(s => isWeekend() ? s.title.includes("Weekend") : s.title.includes("Weekday"))
-        : route.schedules;
+    const validSchedules = route.line.includes("Global Village")
+      ? route.schedules.filter(s => isWeekend() ? s.title.includes("Weekend") : s.title.includes("Weekday"))
+      : route.schedules;
 
-      validSchedules.forEach(s => {
-        s.times.forEach(time => {
-          const d = parseTimeToDate(time);
-          if (d > now && (!closest || d < closest)) closest = d;
-        });
+    validSchedules.forEach(s => {
+      s.times.forEach(time => {
+        const d = parseTimeToDate(time);
+        if (d > now && (!closest || d < closest)) closest = d;
       });
-
-      const card = document.querySelector(`#card-${route.line.replace(/\W+/g,"-")}`);
-      const label = card.querySelector(".next-time");
-
-      if (closest) {
-        const diff = minutesDiff(closest, now);
-        card.className = `next-bus-card ${statusClass(diff)}`;
-        label.textContent = `Next at ${closest.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} (${diff} min)`;
-      } else {
-        card.className = "next-bus-card status-blue";
-        label.textContent = "No more buses today";
-      }
     });
-  }
+
+    const card = document.querySelector(`#card-${route.line.replace(/\W+/g,"-")}`);
+    const listItem = document.querySelector(`#list-${route.line.replace(/\W+/g,"-")}`);
+
+    let label = "No more buses today";
+    let cssClass = "status-blue";
+
+    if (closest) {
+      const diff = minutesDiff(closest, now);
+      cssClass = statusClass(diff);
+      label = `Next at ${closest.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} (${diff} min)`;
+    }
+
+    if (card) {
+      card.className = `next-bus-card ${cssClass}`;
+      card.querySelector(".next-time").textContent = label;
+    }
+
+    if (listItem) {
+      listItem.className = `list-group-item p-1 text-white ${cssClass}`;
+      listItem.querySelector(".next-time").textContent = label;
+    }
+  });
+}
+
 
   function highlightUpcoming() {
     const now = new Date();
@@ -211,6 +296,30 @@
     findNextPerLine();
     highlightUpcoming();
   }, 60000);
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Enable tap/click on rows to show timings
+    document.querySelectorAll("tr.clickable-row").forEach(row => {
+      row.addEventListener("click", () => {
+        const target = row.getAttribute("data-bs-target");
+        if (target) {
+          const collapseEl = document.querySelector(target);
+          if (collapseEl) {
+            const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: true });
+          }
+        }
+      });
+    });
+  });
+
+  // Dashboard urgency color function
+  function getColor(diffMinutes) {
+    if (diffMinutes <= 5) return "red";
+    if (diffMinutes <= 20) return "orange";
+    if (diffMinutes <= 60) return "green";
+    return "blue";
+  }
 </script>
 </body>
 </html>
