@@ -159,10 +159,10 @@
   }
 
   function statusClass(diff) {
-    if (diff <= 15) return "status-red";
-    if (diff <= 30) return "status-orange";
-    if (diff <= 40) return "status-yellow";
-    if (diff > 40) return "status-green";
+    if (diff <= 10) return "status-red";
+    if (diff <= 20) return "status-orange";
+    if (diff <= 30) return "status-yellow";
+    if (diff > 30) return "status-green";
     return "status-blue";
   }
 
@@ -317,9 +317,9 @@
 
   // Dashboard urgency color function
   function getColor(diffMinutes) {
-    if (diffMinutes <= 5) return "red";
-    if (diffMinutes <= 20) return "orange";
-    if (diffMinutes <= 60) return "green";
+    if (diffMinutes <= 8) return "red";
+    if (diffMinutes <= 10) return "orange";
+    if (diffMinutes <= 30) return "green";
     return "blue";
   }
 </script>
