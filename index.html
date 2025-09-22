@@ -56,7 +56,9 @@
   margin: 0;          /* kill default p margin */
   padding: 0;
 }
-
+ li.list-group-item nobr{
+ font-size:0.9em;
+}
 /* Keep desktop grid view */
 @media (min-width: 769px) {
   .dashboard {
@@ -75,7 +77,7 @@
     margin-bottom: 0.25rem;
     font-size: 1rem;
   }
-}
+ }
   </style>
 </head>
 <body>
@@ -159,8 +161,8 @@
   function statusClass(diff) {
     if (diff <= 15) return "status-red";
     if (diff <= 30) return "status-orange";
-    if (diff <= 60) return "status-yellow";
-    if (diff > 60) return "status-green";
+    if (diff <= 40) return "status-yellow";
+    if (diff > 40) return "status-green";
     return "status-blue";
   }
 
@@ -220,7 +222,7 @@
 
 	routes.forEach(route => {
 	  mobileList.insertAdjacentHTML("beforeend", `
-		<li class="list-group-item text-white" id="list-${route.line.replace(/\W+/g,"-")}" style="text-align:center">
+		<li class="list-group-item" id="list-${route.line.replace(/\W+/g,"-")}" style="text-align:center">
 		  <strong>${route.line}</strong> —
 		  <nobr class="next-time">Loading...</nobr>
 		</li>
@@ -266,7 +268,7 @@
     }
 
     if (listItem) {
-      listItem.className = `list-group-item p-1 text-white ${cssClass}`;
+      listItem.className = `list-group-item p-1 ${cssClass}`;
       listItem.querySelector(".next-time").textContent = label;
     }
   });
@@ -295,7 +297,7 @@
   setInterval(() => {
     findNextPerLine();
     highlightUpcoming();
-  }, 60000);
+  }, 10000);
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
