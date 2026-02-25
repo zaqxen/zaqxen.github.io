@@ -23,10 +23,10 @@
     }
     .next-bus-card h6 { margin-bottom: 0.25rem; font-size: 1rem; }
     .status-red { background: #dc3545; color:#fff; }
-    .status-orange { background: #fd7e14; }
+    .status-orange { background: #fd7e14; color:#fff; }
     .status-yellow { background: #ffc107; color: #000; }
-    .status-green { background: #28a745; }
-    .status-blue { background: #007bff; }
+    .status-green { background: #28a745; color:#fff; }
+    .status-blue { background: #007bff; color:#fff; }
     .collapse td { background: #fdfdfd; }
     .table td, .table th { vertical-align: middle; }
 	
@@ -78,6 +78,81 @@
     font-size: 1rem;
   }
  }
+  
+
+/* ============================= */
+/* Urgent flashing (next bus < 5) */
+/* ============================= */
+.urgent-flash {
+  animation: urgentFlash 0.9s infinite;
+}
+@keyframes urgentFlash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
+  50%      { box-shadow: 0 0 0 5px rgba(255,255,255,0.55); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .urgent-flash { animation: none; }
+}
+
+/* ===================================== */
+/* AUTO MOBILE HIGH-CONTRAST (PURE BLACK) */
+/* ===================================== */
+@media (max-width: 768px) {
+
+  body {
+    background: #000 !important;
+    color: #fff !important;
+  }
+
+  h2 {
+    color: #fff;
+    font-weight: 800;
+  }
+
+  /* Dashboard mobile list */
+  .list-group-item {
+    background: #000 !important;
+    color: #fff !important;
+    border: 1px solid #333 !important;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  /* Status colors (high-contrast versions) */
+  .status-red { background: #ff0000 !important; color: #fff !important; }
+  .status-orange { background: #ff6600 !important; color: #fff !important; }
+  .status-yellow { background: #ffaa00 !important; color: #000 !important; }
+  .status-green { background: #00cc44 !important; color: #000 !important; }
+  .status-blue { background: #0066ff !important; color: #fff !important; }
+
+  /* Table styling */
+  .table { color: #fff !important; }
+
+  .table th {
+    background: #111 !important;
+    color: #fff !important;
+  }
+
+  .table td {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #333 !important;
+  }
+
+  .collapse td { background: #000 !important; }
+
+  /* Remove Bootstrap striping */
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #000 !important;
+  }
+
+  /* Highlight upcoming time */
+  .highlight {
+    background: #00ff00 !important;
+    color: #000 !important;
+    font-weight: 800;
+  }
+}
   </style>
 </head>
 <body>
@@ -146,7 +221,13 @@
       ] }
   ];
 
-  // === UTILS ===
+  // Keep state so we can:
+// - flash + vibrate only when a route ENTERS the <5 minutes window
+const prevDiffByLine = {};
+const lastVibrateAtByLine = {};
+
+// === UTILS ===
+
   function parseTimeToDate(timeStr) {
     const [h, m] = timeStr.split(":").map(Number);
     const d = new Date();
@@ -236,6 +317,7 @@
   // === FIND NEXT BUS PER LINE ===
   function findNextPerLine() {
   const now = new Date();
+
   routes.forEach(route => {
     let closest = null;
 
@@ -250,27 +332,45 @@
       });
     });
 
+    const lineKey = route.line;
     const card = document.querySelector(`#card-${route.line.replace(/\W+/g,"-")}`);
     const listItem = document.querySelector(`#list-${route.line.replace(/\W+/g,"-")}`);
 
     let label = "No more buses today";
     let cssClass = "status-blue";
+    let diff = Number.POSITIVE_INFINITY;
 
     if (closest) {
-      const diff = minutesDiff(closest, now);
+      diff = minutesDiff(closest, now);
       cssClass = statusClass(diff);
       label = `Next at ${closest.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} (${diff} min)`;
     }
 
+    const isUrgent = diff <= 5; // < 5 minutes window (includes 5)
+
     if (card) {
-      card.className = `next-bus-card ${cssClass}`;
+      card.className = `next-bus-card ${cssClass}${isUrgent ? " urgent-flash" : ""}`;
       card.querySelector(".next-time").textContent = label;
     }
 
     if (listItem) {
-      listItem.className = `list-group-item p-1 ${cssClass}`;
+      listItem.className = `list-group-item p-1 ${cssClass}${isUrgent ? " urgent-flash" : ""}`;
       listItem.querySelector(".next-time").textContent = label;
     }
+
+    // Vibration alert (only when a route ENTERS the <5 minutes window,
+    // and at most once per minute per line to avoid buzzing constantly)
+    const prev = prevDiffByLine[lineKey];
+    if (isUrgent && (prev === undefined || prev > 5)) {
+      const nowMs = Date.now();
+      const last = lastVibrateAtByLine[lineKey] || 0;
+      if (("vibrate" in navigator) && (nowMs - last > 60000)) {
+        navigator.vibrate([200, 100, 200]);
+        lastVibrateAtByLine[lineKey] = nowMs;
+      }
+    }
+
+    prevDiffByLine[lineKey] = diff;
   });
 }
 
@@ -301,6 +401,7 @@
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    initMobileFullscreen();
     // Enable tap/click on rows to show timings
     document.querySelectorAll("tr.clickable-row").forEach(row => {
       row.addEventListener("click", () => {
@@ -314,6 +415,59 @@
       });
     });
   });
+
+
+
+// Auto full-screen on mobile (requires a user gesture in most browsers).
+// We do it on the first tap/click and also show a small button as a fallback.
+function initMobileFullscreen() {
+  const isMobile = window.matchMedia("(max-width: 768px)").matches ||
+    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (!isMobile) return;
+
+  const fsEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled || document.msFullscreenEnabled;
+  if (!fsEnabled) return;
+
+  const requestFs = () => {
+    const el = document.documentElement;
+    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (!fn) return Promise.reject(new Error("Fullscreen not supported"));
+    try {
+      const r = fn.call(el);
+      return (r && typeof r.then === "function") ? r : Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  // Fallback button (in case the first tap happens on something that shouldn't trigger FS)
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn btn-sm btn-light position-fixed bottom-0 start-50 translate-middle-x mb-3 shadow";
+  btn.style.zIndex = "9999";
+  btn.textContent = "⛶ Full screen";
+  btn.addEventListener("click", () => requestFs().then(() => btn.remove()).catch(() => {}));
+  document.body.appendChild(btn);
+
+  const tryOnce = () => {
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+    requestFs().then(() => btn.remove()).catch(() => {});
+  };
+
+  // First user gesture -> try full-screen
+  document.addEventListener("touchstart", tryOnce, { once: true, passive: true });
+  document.addEventListener("click", tryOnce, { once: true });
+
+  // If user exits full-screen, show button again
+  const onFsChange = () => {
+    const inFs = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!inFs && !document.body.contains(btn)) document.body.appendChild(btn);
+    if (inFs && document.body.contains(btn)) btn.remove();
+  };
+  document.addEventListener("fullscreenchange", onFsChange);
+  document.addEventListener("webkitfullscreenchange", onFsChange);
+}
 
   // Dashboard urgency color function
   function getColor(diffMinutes) {
