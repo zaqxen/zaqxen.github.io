@@ -813,6 +813,73 @@
       .reminder-indicator { font-size: 0.52rem; }
     }
 
+    /* All alarm behavior is implemented in this HTML file. */
+    .schedule-details { display: none; }
+    .schedule-details.show { display: table-row; }
+
+    .alarm-banner[hidden] { display: none !important; }
+
+    .alarm-banner {
+      position: fixed;
+      z-index: 3000;
+      inset: 1rem 1rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      width: min(620px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0.9rem 1rem;
+      border: 2px solid #dc2626;
+      border-radius: 0.9rem;
+      background: #fff1f2;
+      color: #881337;
+      box-shadow: 0 18px 45px rgba(127, 29, 29, 0.3);
+      animation: alarmBannerPulse 0.9s ease-in-out infinite;
+    }
+
+    .alarm-banner-content { min-width: 0; }
+
+    .alarm-banner-title {
+      display: block;
+      margin-bottom: 0.15rem;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .alarm-banner-message {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .alarm-dismiss {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 0.65rem;
+      padding: 0.55rem 0.75rem;
+      background: #b91c1c;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    @keyframes alarmBannerPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.012); }
+    }
+
+    @media (max-width: 560px) {
+      .alarm-banner {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+
+      .alarm-dismiss { width: 100%; }
+    }
+
   </style>
 </head>
 <body>
@@ -867,7 +934,14 @@
 
   <div id="notification-toast" class="notification-toast" role="status" aria-live="polite"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <div id="alarm-banner" class="alarm-banner" role="alertdialog" aria-live="assertive" aria-labelledby="alarm-banner-title" hidden>
+    <div class="alarm-banner-content">
+      <strong id="alarm-banner-title" class="alarm-banner-title">Bus reminder</strong>
+      <span id="alarm-banner-message" class="alarm-banner-message"></span>
+    </div>
+    <button id="alarm-dismiss" class="alarm-dismiss" type="button">Dismiss alarm</button>
+  </div>
+
   <script>
   const routes = [
     { line: "Al Ain (AUD)", destination: "Al Ain", fareCash: "35 AED", fareMasar: "35 AED",
@@ -930,12 +1004,13 @@
       "status-none"
     ];
 
-    const REMINDER_STORAGE_KEY = "ajman-bus-reminders-v1";
+    const REMINDER_STORAGE_KEY = "ajman-bus-reminders-v2";
     const remindersByRoute = new Map();
-    let serviceWorkerRegistration = null;
+    let alarmAudioContext = null;
     let lastHighlightedMinute = -1;
     let toastTimer = 0;
     let reminderCheckInProgress = false;
+    let originalDocumentTitle = document.title;
 
     function escapeHtml(value) {
       return String(value)
@@ -1133,65 +1208,113 @@
       }
     }
 
-    async function registerNotificationServiceWorker(showError = false) {
-      if (serviceWorkerRegistration) return serviceWorkerRegistration;
-      if (!window.isSecureContext || !("serviceWorker" in navigator)) return null;
+    function getAlarmAudioContext() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+
+      if (!alarmAudioContext) alarmAudioContext = new AudioContextClass();
+      return alarmAudioContext;
+    }
+
+    // Browsers require audio to be unlocked during a user gesture. This runs when
+    // the user taps a reminder button, before the future alarm needs to sound.
+    async function unlockAlarmAudio() {
+      const context = getAlarmAudioContext();
+      if (!context) return false;
 
       try {
-        serviceWorkerRegistration = await navigator.serviceWorker.register("./service-worker.js", {
-          scope: "./"
-        });
-        return serviceWorkerRegistration;
+        if (context.state === "suspended") await context.resume();
+
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        gain.gain.setValueAtTime(0.00001, context.currentTime);
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.02);
+        return true;
       } catch (error) {
-        console.warn("Notification service worker registration failed.", error);
-        if (showError) {
-          showToast("Notifications need this page to be served over HTTPS with service-worker.js in the same folder.", true);
-        }
-        return null;
+        console.warn("Alarm audio could not be unlocked.", error);
+        return false;
       }
     }
 
-    async function ensureNotificationPermission() {
-      if (!("Notification" in window)) {
-        showToast("This browser does not support web notifications.", true);
+    async function requestOptionalNotificationPermission() {
+      if (!("Notification" in window) || !window.isSecureContext) return false;
+
+      try {
+        let permission = Notification.permission;
+        if (permission === "default") permission = await Notification.requestPermission();
+        return permission === "granted";
+      } catch (error) {
+        console.warn("Notification permission request failed.", error);
         return false;
       }
+    }
 
-      if (!window.isSecureContext) {
-        showToast("Mobile notifications require HTTPS or localhost. They cannot run directly from a file:// page.", true);
+    async function playAlarmSound() {
+      const context = getAlarmAudioContext();
+      if (!context) return false;
+
+      try {
+        if (context.state === "suspended") await context.resume();
+        const start = context.currentTime + 0.03;
+        const tones = [880, 660, 880, 660, 1040];
+
+        tones.forEach((frequency, index) => {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          const toneStart = start + index * 0.38;
+          const toneEnd = toneStart + 0.25;
+
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(frequency, toneStart);
+          gain.gain.setValueAtTime(0.0001, toneStart);
+          gain.gain.exponentialRampToValueAtTime(0.32, toneStart + 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, toneEnd);
+
+          oscillator.connect(gain);
+          gain.connect(context.destination);
+          oscillator.start(toneStart);
+          oscillator.stop(toneEnd + 0.02);
+        });
+
+        return true;
+      } catch (error) {
+        console.warn("Alarm sound could not be played.", error);
         return false;
       }
+    }
 
-      let permission = Notification.permission;
-      if (permission === "default") {
-        try {
-          permission = await Notification.requestPermission();
-        } catch (error) {
-          console.warn("Notification permission request failed.", error);
-          showToast("The notification permission request could not be completed.", true);
-          return false;
-        }
+    function showAlarmBanner(title, message) {
+      const banner = document.getElementById("alarm-banner");
+      document.getElementById("alarm-banner-title").textContent = title;
+      document.getElementById("alarm-banner-message").textContent = message;
+      banner.hidden = false;
+      document.title = `🔔 ${title}`;
+    }
+
+    function dismissAlarmBanner() {
+      const banner = document.getElementById("alarm-banner");
+      if (banner) banner.hidden = true;
+      document.title = originalDocumentTitle;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if ("vibrate" in navigator) navigator.vibrate(0);
+    }
+
+    function speakAlarm(message) {
+      if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
+
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {
+        console.warn("Alarm speech could not be played.", error);
       }
-
-      if (permission !== "granted") {
-        const message = permission === "denied"
-          ? "Notifications are blocked. Enable them for this site in your browser settings."
-          : "Notification permission was not enabled.";
-        showToast(message, true);
-        return false;
-      }
-
-      // Mobile browsers generally require ServiceWorkerRegistration.showNotification().
-      const registration = await registerNotificationServiceWorker(false);
-      const likelyMobile = window.matchMedia("(pointer: coarse)").matches
-        || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-
-      if (likelyMobile && !(registration && "showNotification" in registration)) {
-        showToast("Mobile notifications require service-worker.js and HTTPS. Keep both files in the same folder on your server.", true);
-        return false;
-      }
-
-      return true;
     }
 
     function syncReminderCard(routeId) {
@@ -1204,12 +1327,12 @@
       const indicator = card.querySelector(".reminder-indicator");
       if (reminder) {
         indicator.textContent = "🔔";
-        indicator.title = `${reminder.thresholdMinutes}-minute notification active`;
-        indicator.setAttribute("aria-label", `${reminder.thresholdMinutes}-minute notification active`);
+        indicator.title = `${reminder.thresholdMinutes}-minute alarm active`;
+        indicator.setAttribute("aria-label", `${reminder.thresholdMinutes}-minute alarm active`);
       } else {
         indicator.textContent = "";
         indicator.removeAttribute("title");
-        indicator.setAttribute("aria-label", "No notification active");
+        indicator.setAttribute("aria-label", "No alarm active");
       }
     }
 
@@ -1369,8 +1492,12 @@
 
       setReminderButtonsDisabled(card, true);
       try {
-        const permissionEnabled = await ensureNotificationPermission();
-        if (!permissionEnabled) return;
+        // Unlock sound immediately from this user click. Notification permission is
+        // optional and never blocks the in-page alarm.
+        const [audioEnabled, notificationEnabled] = await Promise.all([
+          unlockAlarmAudio(),
+          requestOptionalNotificationPermission()
+        ]);
 
         const now = new Date();
         const next = getUpcomingDepartures(route, now, 1)[0];
@@ -1397,9 +1524,15 @@
 
         const remainingSeconds = secondsUntil(next.date, now);
         if (remainingSeconds <= thresholdMinutes * 60) {
-          showToast(`${route.line} is already within ${thresholdMinutes} minutes. Notifying now.`);
+          showToast(`${route.line} is already within ${thresholdMinutes} minutes. Alarm is triggering now.`);
         } else {
-          showToast(`Notification set for ${route.line} at ${thresholdMinutes} minutes before ${formatDeparture(next.date, now)}.`);
+          const fallbackNote = audioEnabled
+            ? ""
+            : " Keep this page visible because this browser did not unlock audio.";
+          const notificationNote = notificationEnabled
+            ? " Browser notification enabled."
+            : " In-page alarm enabled.";
+          showToast(`Alarm set for ${route.line}, ${thresholdMinutes} minutes before ${formatDeparture(next.date, now)}.${notificationNote}${fallbackNote}`);
         }
 
         await checkReminders(now);
@@ -1418,40 +1551,43 @@
       showToast(reminder ? `Notification cancelled for ${reminder.line}.` : "Notification cancelled.");
     }
 
-    async function displayBusNotification(reminder, now) {
-      if (!("Notification" in window) || Notification.permission !== "granted") return false;
-
+    async function displayBusAlarm(reminder, now) {
       const departure = new Date(reminder.departureTimestamp);
       const remainingSeconds = secondsUntil(departure, now);
-      const title = `${reminder.line}: ${formatCountdown(remainingSeconds)} to departure`;
-      const options = {
-        body: `Departs at ${formatDeparture(departure, now)}.`,
-        tag: `ajman-bus-${reminder.routeId}-${reminder.departureTimestamp}`,
-        renotify: false,
-        timestamp: reminder.departureTimestamp,
-        vibrate: [180, 100, 180],
-        data: { url: window.location.href }
-      };
+      const countdownText = formatCountdown(remainingSeconds);
+      const title = `${reminder.line}: ${countdownText} to departure`;
+      const message = `Departs at ${formatDeparture(departure, now)}.`;
 
-      try {
-        const registration = serviceWorkerRegistration || await registerNotificationServiceWorker(false);
-        if (registration && "showNotification" in registration) {
-          await registration.showNotification(title, options);
-        } else {
-          const notification = new Notification(title, options);
+      // The banner is the guaranteed delivery method while this HTML page is open.
+      showAlarmBanner(title, message);
+      showToast(`🔔 ${title}`);
+      await playAlarmSound();
+      speakAlarm(`${reminder.line}. ${reminder.thresholdMinutes} minute bus reminder. Departure at ${formatClockTime(departure)}.`);
+
+      if ("vibrate" in navigator) {
+        navigator.vibrate([250, 120, 250, 120, 500]);
+      }
+
+      // Desktop browsers may also show an operating-system notification. This is
+      // optional; the alarm succeeds even when notifications are unavailable.
+      if ("Notification" in window && Notification.permission === "granted") {
+        try {
+          const notification = new Notification(title, {
+            body: message,
+            tag: `ajman-bus-${reminder.routeId}-${reminder.departureTimestamp}`,
+            renotify: false,
+            timestamp: reminder.departureTimestamp
+          });
           notification.onclick = () => {
             window.focus();
             notification.close();
           };
+        } catch (error) {
+          console.warn("Optional browser notification could not be displayed.", error);
         }
-
-        if ("vibrate" in navigator) navigator.vibrate([180, 100, 180]);
-        return true;
-      } catch (error) {
-        console.warn("Bus notification could not be displayed.", error);
-        showToast("The notification could not be displayed. Keep this page open and check browser notification settings.", true);
-        return false;
       }
+
+      return true;
     }
 
     async function checkReminders(now = new Date()) {
@@ -1472,7 +1608,7 @@
 
           const triggerTimestamp = reminder.departureTimestamp - reminder.thresholdMinutes * 60 * 1000;
           if (!reminder.notified && now.getTime() >= triggerTimestamp) {
-            const delivered = await displayBusNotification(reminder, now);
+            const delivered = await displayBusAlarm(reminder, now);
             if (delivered) {
               reminder.notified = true;
               remindersByRoute.set(routeId, reminder);
@@ -1522,7 +1658,7 @@
                 <span class="compact-label">Next</span>
                 <time class="compact-time next-time">Checking…</time>
                 <span class="countdown-badge next-countdown">—</span>
-                <span class="reminder-indicator" aria-label="Notification active"></span>
+                <span class="reminder-indicator" aria-label="Alarm active"></span>
               </div>
               <div class="compact-departure following-departure">
                 <span class="compact-label">Then</span>
@@ -1661,6 +1797,25 @@
       });
     }
 
+    function initScheduleToggles() {
+      document.querySelectorAll(".schedule-toggle").forEach(button => {
+        button.addEventListener("click", () => {
+          const selector = button.getAttribute("data-bs-target");
+          const details = selector ? document.querySelector(selector) : null;
+          if (!details) return;
+
+          const isOpen = details.classList.toggle("show");
+          button.setAttribute("aria-expanded", String(isOpen));
+          button.textContent = isOpen ? "Hide times" : "View times";
+        });
+      });
+    }
+
+    function initAlarmBanner() {
+      const dismissButton = document.getElementById("alarm-dismiss");
+      dismissButton?.addEventListener("click", dismissAlarmBanner);
+    }
+
     function initFullscreenButton() {
       const button = document.getElementById("fullscreen-button");
       const requestFullscreen = document.documentElement.requestFullscreen
@@ -1697,13 +1852,11 @@
       loadReminders();
       renderDashboard();
       renderTable();
+      initScheduleToggles();
       initFullscreenButton();
+      initAlarmBanner();
       initSwipeActions();
       syncAllReminderCards();
-
-      // Registration is attempted quietly. Permission is requested only after a
-      // reminder button is tapped, as required by mobile browsers.
-      registerNotificationServiceWorker(false);
 
       const now = new Date();
       checkReminders(now);
