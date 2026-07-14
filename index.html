@@ -3,186 +3,686 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4f7fb" />
   <title>Ajman Bus Schedule</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
   <style>
-    body { background: #f8f9fa; }
-    .highlight { background: #ffc107 !important; color: #000; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    :root {
+      color-scheme: light;
+      --page-bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-muted: #f8fafc;
+      --text: #172033;
+      --muted: #64748b;
+      --border: #dfe6ef;
+      --shadow: 0 10px 30px rgba(23, 32, 51, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    .app-shell {
+      width: min(1480px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.5rem 0 3rem;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: clamp(1.65rem, 4vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+    }
+
+    .page-subtitle {
+      margin: 0.25rem 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .current-time {
+      flex: 0 0 auto;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 0.8rem;
+      background: var(--surface);
+      box-shadow: 0 4px 16px rgba(23, 32, 51, 0.05);
+      text-align: right;
+    }
+
+    .current-time-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #current-clock {
+      display: block;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .section-heading {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
     }
+
     .next-bus-card {
-      border-radius: 6px;
-      padding: 0.75rem;
-      text-align: center;
+      --accent: #64748b;
+      --accent-soft: #f1f5f9;
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-left: 6px solid var(--accent);
+      border-radius: 0.9rem;
+      background: var(--surface);
+      box-shadow: 0 5px 18px rgba(23, 32, 51, 0.055);
+    }
+
+    .next-bus-card.status-urgent {
+      --accent: #dc2626;
+      --accent-soft: #fee2e2;
+    }
+
+    .next-bus-card.status-soon {
+      --accent: #ea580c;
+      --accent-soft: #ffedd5;
+    }
+
+    .next-bus-card.status-medium {
+      --accent: #ca8a04;
+      --accent-soft: #fef9c3;
+    }
+
+    .next-bus-card.status-near {
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+    }
+
+    .next-bus-card.status-later {
+      --accent: #15803d;
+      --accent-soft: #dcfce7;
+    }
+
+    .next-bus-card.status-none {
+      --accent: #64748b;
+      --accent-soft: #f1f5f9;
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.85rem 0.95rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .route-name {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .route-destination {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .status-dot {
+      width: 0.7rem;
+      height: 0.7rem;
+      margin-top: 0.25rem;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .urgent-flash .status-dot,
+    .urgent-flash .countdown-badge {
+      animation: urgentPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes urgentPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.72; }
+    }
+
+    .departure-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .departure-item {
+      min-width: 0;
+      padding: 0.75rem 0.9rem 0.85rem;
+    }
+
+    .departure-item + .departure-item {
+      border-left: 1px solid var(--border);
+      background: var(--surface-muted);
+    }
+
+    .departure-label {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .departure-time {
+      display: block;
+      min-height: 1.5rem;
+      overflow-wrap: anywhere;
+      font-size: 0.98rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .departure-direction {
+      display: block;
+      min-height: 2.1em;
+      margin-top: 0.2rem;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.25;
+    }
+
+    .countdown-badge,
+    .following-gap {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.74rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .schedule-panel {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .table-responsive { margin: 0; }
+
+    .bus-table {
+      margin: 0;
+      --bs-table-bg: transparent;
+      --bs-table-striped-bg: #f8fafc;
+      --bs-table-hover-bg: #f1f5f9;
+    }
+
+    .bus-table th {
+      padding: 0.85rem 0.9rem;
+      border-color: #334155;
+      background: #1e293b;
       color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .bus-table td {
+      padding: 0.8rem 0.9rem;
+      border-color: var(--border);
+      vertical-align: middle;
       font-size: 0.9rem;
     }
-    .next-bus-card h6 { margin-bottom: 0.25rem; font-size: 1rem; }
-    .status-red { background: #dc3545; color:#fff; }
-    .status-orange { background: #fd7e14; color:#fff; }
-    .status-yellow { background: #ffc107; color: #000; }
-    .status-green { background: #28a745; color:#fff; }
-    .status-blue { background: #007bff; color:#fff; }
-    .collapse td { background: #fdfdfd; }
-    .table td, .table th { vertical-align: middle; }
-	
-	/* === Dashboard as compact stacked stripes === */
-.dashboard {
-  display: block;     /* no grid on mobile */
-  margin: 0;
-  padding: 0;
-  gap: 0;             /* kill gap */
-}
 
-.next-bus-card {
-  border-radius: 0;   /* no rounded edges */
-  padding: 2px 6px;   /* thin padding */
-  margin: 0;          /* no margins */
-  text-align: left;
-  font-size: 0.8rem;
-  line-height: 1.2;
-}
+    .route-cell { font-weight: 800; }
+    .fare-cell { white-space: nowrap; }
 
-.next-bus-card h6 {
-  margin: 0;
-  font-size: 0.85rem;
-}
+    .schedule-toggle {
+      white-space: nowrap;
+      font-weight: 700;
+    }
 
-.next-bus-card p {
-  margin: 0;          /* kill default p margin */
-  padding: 0;
-}
- li.list-group-item nobr{
- font-size:0.9em;
-}
-/* Keep desktop grid view */
-@media (min-width: 769px) {
-  .dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
-    margin-bottom: 2rem;
-  }
-  .next-bus-card {
-    border-radius: 6px;
-    padding: 0.75rem;
-    text-align: center;
-    font-size: 0.9rem;
-  }
-  .next-bus-card h6 {
-    margin-bottom: 0.25rem;
-    font-size: 1rem;
-  }
- }
-  
+    .schedule-details td {
+      padding: 0;
+      background: #fbfdff !important;
+    }
 
-/* ============================= */
-/* Urgent flashing (next bus < 5) */
-/* ============================= */
-.urgent-flash {
-  animation: urgentFlash 0.9s infinite;
-}
-@keyframes urgentFlash {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
-  50%      { box-shadow: 0 0 0 5px rgba(255,255,255,0.55); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .urgent-flash { animation: none; }
-}
+    .schedule-details-inner {
+      padding: 1rem;
+    }
 
-/* ===================================== */
-/* AUTO MOBILE HIGH-CONTRAST (PURE BLACK) */
-/* ===================================== */
-@media (max-width: 768px) {
+    .schedule-group + .schedule-group {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
 
-  body {
-    background: #000 !important;
-    color: #fff !important;
-  }
+    .schedule-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
 
-  h2 {
-    color: #fff;
-    font-weight: 800;
-  }
+    .schedule-title {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
 
-  /* Dashboard mobile list */
-  .list-group-item {
-    background: #000 !important;
-    color: #fff !important;
-    border: 1px solid #333 !important;
-    font-size: 1.05rem;
-    font-weight: 600;
-  }
+    .times {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+    }
 
-  /* Status colors (high-contrast versions) */
-  .status-red { background: #ff0000 !important; color: #fff !important; }
-  .status-orange { background: #ff6600 !important; color: #fff !important; }
-  .status-yellow { background: #ffaa00 !important; color: #000 !important; }
-  .status-green { background: #00cc44 !important; color: #000 !important; }
-  .status-blue { background: #0066ff !important; color: #fff !important; }
+    .time-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 3.6rem;
+      padding: 0.3rem 0.48rem;
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      background: #fff;
+      color: #334155;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
 
-  /* Table styling */
-  .table { color: #fff !important; }
+    .time-chip.is-next {
+      border-color: #2563eb;
+      background: #dbeafe;
+      color: #1d4ed8;
+      box-shadow: inset 0 0 0 1px #2563eb;
+    }
 
-  .table th {
-    background: #111 !important;
-    color: #fff !important;
-  }
+    .time-chip.is-following {
+      border-color: #94a3b8;
+      background: #f1f5f9;
+      color: #334155;
+    }
 
-  .table td {
-    background: #000 !important;
-    color: #fff !important;
-    border-color: #333 !important;
-  }
+    .time-chip.is-past {
+      opacity: 0.42;
+      text-decoration: line-through;
+    }
 
-  .collapse td { background: #000 !important; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin: -0.35rem 0 1rem;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
 
-  /* Remove Bootstrap striping */
-  .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #000 !important;
-  }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
 
-  /* Highlight upcoming time */
-  .highlight {
-    background: #00ff00 !important;
-    color: #000 !important;
-    font-weight: 800;
-  }
-}
+    .legend-swatch {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .fullscreen-button {
+      position: fixed;
+      right: 0.8rem;
+      bottom: 0.8rem;
+      z-index: 1050;
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    @media (max-width: 767.98px) {
+      .app-shell {
+        width: min(100% - 1rem, 760px);
+        padding-top: 0.8rem;
+      }
+
+      .page-header {
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .page-subtitle { font-size: 0.82rem; }
+      .current-time { padding: 0.5rem 0.65rem; }
+      .current-time-label { display: none; }
+      #current-clock { font-size: 0.88rem; }
+
+      .dashboard {
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+      }
+
+      .next-bus-card { border-radius: 0.75rem; }
+      .card-heading { padding: 0.7rem 0.75rem 0.55rem; }
+      .route-name { font-size: 0.93rem; }
+      .departure-item { padding: 0.62rem 0.7rem 0.7rem; }
+      .departure-time { font-size: 0.88rem; }
+      .departure-direction { min-height: 0; }
+
+      .bus-table th,
+      .bus-table td {
+        padding: 0.68rem 0.55rem;
+        font-size: 0.78rem;
+      }
+
+      .schedule-toggle {
+        padding: 0.3rem 0.48rem;
+        font-size: 0.72rem;
+      }
+
+      .fullscreen-button { display: inline-flex; }
+    }
+
+    @media (max-width: 430px) {
+      .page-header { align-items: flex-start; }
+      .current-time { margin-top: 0.15rem; }
+      .page-subtitle { max-width: 22rem; }
+      .departure-direction { font-size: 0.66rem; }
+      .countdown-badge, .following-gap { font-size: 0.68rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+
+    /* Compact departure board: one route per slim row */
+    .app-shell {
+      width: min(1180px, calc(100% - 1rem));
+      padding: 0.65rem 0 1.5rem;
+    }
+
+    .page-header {
+      align-items: center;
+      margin-bottom: 0.55rem;
+    }
+
+    .page-title {
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+      letter-spacing: -0.025em;
+    }
+
+    .page-subtitle { display: none; }
+
+    .current-time {
+      padding: 0.38rem 0.6rem;
+      border-radius: 0.6rem;
+      box-shadow: none;
+    }
+
+    .current-time-label { display: none; }
+    #current-clock { font-size: 0.86rem; }
+
+    .section-heading {
+      margin-bottom: 0.35rem;
+      font-size: 0.88rem;
+    }
+
+    .legend {
+      gap: 0.25rem 0.7rem;
+      margin: 0 0 0.45rem;
+      font-size: 0.68rem;
+    }
+
+    .legend-swatch {
+      width: 0.52rem;
+      height: 0.52rem;
+    }
+
+    .dashboard {
+      display: block;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.7rem;
+      background: var(--surface);
+      box-shadow: 0 3px 12px rgba(23, 32, 51, 0.05);
+    }
+
+    .next-bus-card {
+      display: grid;
+      grid-template-columns: minmax(150px, 1fr) minmax(170px, auto) minmax(145px, auto);
+      align-items: center;
+      gap: 0.8rem;
+      min-height: 46px;
+      padding: 0.38rem 0.7rem;
+      border: 0;
+      border-bottom: 1px solid var(--border);
+      border-left: 5px solid var(--accent);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .next-bus-card:last-child { border-bottom: 0; }
+
+    .route-name {
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.86rem;
+      line-height: 1.15;
+    }
+
+    .compact-departure {
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-start;
+      gap: 0.35rem;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .compact-label {
+      color: var(--muted);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .compact-time {
+      overflow: hidden;
+      color: var(--text);
+      text-overflow: ellipsis;
+      font-size: 0.84rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-badge {
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 0.22rem 0.42rem;
+      font-size: 0.68rem;
+    }
+
+    .following-departure {
+      justify-content: flex-end;
+      color: var(--muted);
+    }
+
+    .following-departure .compact-time {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .urgent-flash .countdown-badge {
+      animation: urgentPulse 1s ease-in-out infinite;
+    }
+
+    @media (max-width: 767.98px) {
+      .app-shell {
+        width: calc(100% - 0.5rem);
+        padding-top: 0.35rem;
+      }
+
+      .page-header { margin-bottom: 0.4rem; }
+      .page-title { font-size: 1.08rem; }
+      .current-time { padding: 0.28rem 0.42rem; }
+      #current-clock { font-size: 0.72rem; }
+      .section-heading { font-size: 0.8rem; }
+
+      .legend {
+        gap: 0.2rem 0.5rem;
+        font-size: 0.6rem;
+      }
+
+      .next-bus-card {
+        grid-template-columns: minmax(112px, 1fr) minmax(128px, auto) minmax(94px, auto);
+        gap: 0.35rem;
+        min-height: 40px;
+        padding: 0.3rem 0.42rem;
+        border-left-width: 4px;
+      }
+
+      .route-name { font-size: 0.74rem; }
+      .compact-departure { gap: 0.22rem; }
+      .compact-label { font-size: 0.52rem; }
+      .compact-time { font-size: 0.7rem; }
+      .countdown-badge {
+        padding: 0.18rem 0.32rem;
+        font-size: 0.58rem;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .legend-item:nth-child(3),
+      .legend-item:nth-child(4) { display: none; }
+
+      .next-bus-card {
+        grid-template-columns: minmax(105px, 1fr) minmax(122px, auto) minmax(84px, auto);
+      }
+
+      .compact-label { display: none; }
+      .following-departure::before {
+        content: "Then";
+        color: var(--muted);
+        font-size: 0.52rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+    }
   </style>
 </head>
 <body>
+  <main class="app-shell">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">🚌 Ajman Bus Schedule</h1>
+        <p class="page-subtitle">Live departures based on your device's local time.</p>
+      </div>
+      <div class="current-time" aria-label="Current local time">
+        <span class="current-time-label">Current time</span>
+        <time id="current-clock">--:--:--</time>
+      </div>
+    </header>
 
-<div class="container my-4">
-  <h2 class="text-center mb-4">🚌 Ajman Bus Schedule</h2>
+    <section aria-labelledby="next-departures-heading">
+      <h2 id="next-departures-heading" class="section-heading">Next departures</h2>
+      <div class="legend" aria-label="Departure urgency legend">
+        <span class="legend-item" style="color:#dc2626"><span class="legend-swatch"></span>5 min or less</span>
+        <span class="legend-item" style="color:#ea580c"><span class="legend-swatch"></span>Under 10 min</span>
+        <span class="legend-item" style="color:#ca8a04"><span class="legend-swatch"></span>10–20 min</span>
+        <span class="legend-item" style="color:#2563eb"><span class="legend-swatch"></span>20–30 min</span>
+        <span class="legend-item" style="color:#15803d"><span class="legend-swatch"></span>More than 30 min</span>
+      </div>
+      <div id="dashboard" class="dashboard"></div>
+    </section>
 
-  <!-- Per-Line Dashboard -->
-  <div id="dashboard" class="dashboard mb-3"></div>
+    <section aria-labelledby="all-routes-heading">
+      <h2 id="all-routes-heading" class="section-heading">All routes and times</h2>
+      <div class="schedule-panel">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover bus-table align-middle">
+            <thead>
+              <tr>
+                <th scope="col">Bus line</th>
+                <th scope="col" class="d-none d-sm-table-cell">Destination</th>
+                <th scope="col">Cash</th>
+                <th scope="col" class="d-none d-md-table-cell">Masar</th>
+                <th scope="col"><span class="visually-hidden">Schedule</span></th>
+              </tr>
+            </thead>
+            <tbody id="bus-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  <!-- Bus Table -->
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Bus Line</th>
-          <th>Destination</th>
-          <th>Cash Fare</th>
-          <th>Masar Card</th>
-          <th class="d-none d-md-table-cell">Schedule</th>
-        </tr>
-      </thead>
-      <tbody id="bus-table-body"></tbody>
-    </table>
-  </div>
-</div>
+  <button id="fullscreen-button" type="button" class="btn fullscreen-button" aria-label="Open full screen">
+    ⛶ Full screen
+  </button>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  // === DATA ===
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
   const routes = [
     { line: "Al Ain (AUD)", destination: "Al Ain", fareCash: "35 AED", fareMasar: "35 AED",
       schedules: [{ title: "From Al Musalla Station", link: "#", times: ["08:00","12:00","16:00","20:00"] }] },
@@ -221,261 +721,404 @@
       ] }
   ];
 
-  // Keep state so we can:
-// - flash + vibrate only when a route ENTERS the <5 minutes window
-const prevDiffByLine = {};
-const lastVibrateAtByLine = {};
+    // This board shows departures from Al Musalla only. Remove return-direction
+    // schedules and shorten schedule headings because the origin is understood.
+    routes.forEach(route => {
+      route.schedules = route.schedules.filter(schedule =>
+        !/from\s+(abu dhabi|global village)/i.test(schedule.title)
+      );
 
-// === UTILS ===
-
-  function parseTimeToDate(timeStr) {
-    const [h, m] = timeStr.split(":").map(Number);
-    const d = new Date();
-    d.setHours(h, m, 0, 0);
-    return d;
-  }
-
-  function minutesDiff(a, b) {
-    return Math.round((a - b) / 60000);
-  }
-
-  function statusClass(diff) {
-    if (diff <= 10) return "status-red";
-    if (diff <= 20) return "status-orange";
-    if (diff <= 30) return "status-yellow";
-    if (diff > 30) return "status-green";
-    return "status-blue";
-  }
-
-  function isWeekend() {
-    const day = new Date().getDay(); // 0=Sun, 5=Fri, 6=Sat
-    return day === 5 || day === 6;
-  }
-
-  // === RENDER TABLE ===
-	const tbody = document.getElementById("bus-table-body");
-	routes.forEach((route, i) => {
-	  const id = "collapse-" + i;
-	  tbody.insertAdjacentHTML("beforeend", `
-		<tr class="clickable-row" data-bs-target="#${id}">
-		  <td>${route.line}</td>
-		  <td>${route.destination}</td>
-		  <td>${route.fareCash}</td>
-		  <td>${route.fareMasar}</td>
-		  <td class="d-none d-md-table-cell">
-			<button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#${id}">
-			  View Times
-			</button>
-		  </td>
-		</tr>
-		<tr class="collapse" id="${id}">
-		  <td colspan="5">
-			${route.schedules.map(s => `
-			  <strong>${s.title}:</strong> <a href="${s.link}" target="_blank">Click here</a><br>
-			  <span class="times" data-line="${route.line}">${s.times.join(", ")}</span><br><br>
-			`).join("")}
-		  </td>
-		</tr>
-	  `);
-	});
-
-
-
-  // === RENDER DASHBOARD ===
-  const dashboard = document.getElementById("dashboard");
-
-	// Desktop = card grid
-	const desktopContainer = document.createElement("div");
-	desktopContainer.className = "dashboard d-none d-md-grid";
-
-	routes.forEach(route => {
-	  desktopContainer.insertAdjacentHTML("beforeend", `
-		<div class="next-bus-card" id="card-${route.line.replace(/\W+/g,"-")}">
-		  <h6>${route.line}</h6>
-		  <p class="next-time">Loading...</p>
-		</div>
-	  `);
-	});
-
-	// Mobile = list group
-	const mobileList = document.createElement("ul");
-	mobileList.className = "list-group d-md-none";
-
-	routes.forEach(route => {
-	  mobileList.insertAdjacentHTML("beforeend", `
-		<li class="list-group-item" id="list-${route.line.replace(/\W+/g,"-")}" style="text-align:center">
-		  <strong>${route.line}</strong> -
-		  <nobr class="next-time">Loading...</nobr>
-		</li>
-	  `);
-	});
-
-	dashboard.appendChild(desktopContainer);
-	dashboard.appendChild(mobileList);
-
-
-  // === FIND NEXT BUS PER LINE ===
-  function findNextPerLine() {
-  const now = new Date();
-
-  routes.forEach(route => {
-    let closest = null;
-
-    const validSchedules = route.line.includes("Global Village")
-      ? route.schedules.filter(s => isWeekend() ? s.title.includes("Weekend") : s.title.includes("Weekday"))
-      : route.schedules;
-
-    validSchedules.forEach(s => {
-      s.times.forEach(time => {
-        const d = parseTimeToDate(time);
-        if (d > now && (!closest || d < closest)) closest = d;
+      route.schedules.forEach(schedule => {
+        if (/weekend/i.test(schedule.title)) schedule.title = "Weekend";
+        else if (/weekday/i.test(schedule.title)) schedule.title = "Weekday";
+        else schedule.title = "Daily";
       });
     });
 
-    const lineKey = route.line;
-    const card = document.querySelector(`#card-${route.line.replace(/\W+/g,"-")}`);
-    const listItem = document.querySelector(`#list-${route.line.replace(/\W+/g,"-")}`);
+    const STATUS_CLASSES = [
+      "status-urgent",
+      "status-soon",
+      "status-medium",
+      "status-near",
+      "status-later",
+      "status-none"
+    ];
 
-    let label = "No more buses today";
-    let cssClass = "status-blue";
-    let diff = Number.POSITIVE_INFINITY;
+    const previousUrgentState = new Map();
+    const lastVibrationAt = new Map();
+    let lastHighlightedMinute = -1;
 
-    if (closest) {
-      diff = minutesDiff(closest, now);
-      cssClass = statusClass(diff);
-      label = `Next at ${closest.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} (${diff} min)`;
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    const isUrgent = diff <= 5; // < 5 minutes window (includes 5)
-
-    if (card) {
-      card.className = `next-bus-card ${cssClass}${isUrgent ? " urgent-flash" : ""}`;
-      card.querySelector(".next-time").textContent = label;
+    function routeDomId(route, index) {
+      const slug = route.line
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      return `${slug || "route"}-${index}`;
     }
 
-    if (listItem) {
-      listItem.className = `list-group-item p-1 ${cssClass}${isUrgent ? " urgent-flash" : ""}`;
-      listItem.querySelector(".next-time").textContent = label;
+    function startOfDay(date) {
+      const result = new Date(date);
+      result.setHours(0, 0, 0, 0);
+      return result;
     }
 
-    // Vibration alert (only when a route ENTERS the <5 minutes window,
-    // and at most once per minute per line to avoid buzzing constantly)
-    const prev = prevDiffByLine[lineKey];
-    if (isUrgent && (prev === undefined || prev > 5)) {
-      const nowMs = Date.now();
-      const last = lastVibrateAtByLine[lineKey] || 0;
-      if (("vibrate" in navigator) && (nowMs - last > 60000)) {
-        navigator.vibrate([200, 100, 200]);
-        lastVibrateAtByLine[lineKey] = nowMs;
+    function addDays(date, amount) {
+      const result = new Date(date);
+      result.setDate(result.getDate() + amount);
+      return result;
+    }
+
+    // Preserves the original schedule rule: Friday and Saturday are treated as weekend.
+    function isWeekendDate(date) {
+      const day = date.getDay();
+      return day === 5 || day === 6;
+    }
+
+    function scheduleAppliesToDate(schedule, serviceDate) {
+      const title = schedule.title.toLowerCase();
+      if (title.includes("weekend")) return isWeekendDate(serviceDate);
+      if (title.includes("weekday")) return !isWeekendDate(serviceDate);
+      return true;
+    }
+
+    function cleanScheduleTitle(title) {
+      return title.replace(/^(weekday|weekend)\s*-\s*/i, "");
+    }
+
+    function timeOnServiceDate(timeString, serviceDate, schedule) {
+      const [hours, minutes] = timeString.split(":").map(Number);
+      const departure = startOfDay(serviceDate);
+      departure.setHours(hours, minutes, 0, 0);
+
+      // Global Village departures after midnight belong to the previous service evening.
+      const isDayTagged = /weekday|weekend/i.test(schedule.title);
+      if (isDayTagged && hours < 4) departure.setDate(departure.getDate() + 1);
+
+      return departure;
+    }
+
+    function getUpcomingDepartures(route, now, limit = 2) {
+      const byTimestamp = new Map();
+      const today = startOfDay(now);
+
+      // Include yesterday for after-midnight services, plus enough future days to
+      // always find a next and following departure.
+      for (let dayOffset = -1; dayOffset <= 3; dayOffset += 1) {
+        const serviceDate = addDays(today, dayOffset);
+
+        route.schedules.forEach(schedule => {
+          if (!scheduleAppliesToDate(schedule, serviceDate)) return;
+
+          schedule.times.forEach(timeString => {
+            const departure = timeOnServiceDate(timeString, serviceDate, schedule);
+            if (departure <= now) return;
+
+            const timestamp = departure.getTime();
+            const direction = cleanScheduleTitle(schedule.title);
+
+            if (!byTimestamp.has(timestamp)) {
+              byTimestamp.set(timestamp, {
+                date: departure,
+                directions: new Set([direction])
+              });
+            } else {
+              byTimestamp.get(timestamp).directions.add(direction);
+            }
+          });
+        });
       }
+
+      return [...byTimestamp.values()]
+        .sort((a, b) => a.date - b.date)
+        .slice(0, limit)
+        .map(item => ({
+          date: item.date,
+          direction: [...item.directions].join(" • ")
+        }));
     }
 
-    prevDiffByLine[lineKey] = diff;
-  });
-}
+    function sameCalendarDay(a, b) {
+      return a.getFullYear() === b.getFullYear()
+        && a.getMonth() === b.getMonth()
+        && a.getDate() === b.getDate();
+    }
 
+    function formatClockTime(date, includeSeconds = false) {
+      const parts = [
+        String(date.getHours()).padStart(2, "0"),
+        String(date.getMinutes()).padStart(2, "0")
+      ];
+      if (includeSeconds) parts.push(String(date.getSeconds()).padStart(2, "0"));
+      return parts.join(":");
+    }
 
-  function highlightUpcoming() {
-    const now = new Date();
-    document.querySelectorAll(".times").forEach(el => {
-      const times = el.innerText.split(",").map(t => t.trim());
-      let highlighted = false;
-      el.innerHTML = times.map(time => {
-        const d = parseTimeToDate(time);
-        if (!highlighted && d > now) {
-          highlighted = true;
-          return `<span class="highlight">${time}</span>`;
+    function formatDeparture(date, now) {
+      if (sameCalendarDay(date, now)) return formatClockTime(date);
+
+      const tomorrow = addDays(startOfDay(now), 1);
+      if (sameCalendarDay(date, tomorrow)) return `Tomorrow ${formatClockTime(date)}`;
+
+      return `${date.toLocaleDateString([], { weekday: "short" })} ${formatClockTime(date)}`;
+    }
+
+    function secondsUntil(departure, now) {
+      const milliseconds = departure.getTime() - now.getTime();
+      if (!Number.isFinite(milliseconds)) return Number.POSITIVE_INFINITY;
+      return Math.max(0, Math.ceil(milliseconds / 1000));
+    }
+
+    function formatCountdown(totalSeconds) {
+      if (!Number.isFinite(totalSeconds)) return "—";
+      if (totalSeconds <= 0) return "Now";
+
+      if (totalSeconds < 600) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
+      }
+
+      const totalMinutes = Math.ceil(totalSeconds / 60);
+      if (totalMinutes >= 60) {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+      }
+
+      return `${totalMinutes} min`;
+    }
+
+    function statusClass(totalSeconds) {
+      if (totalSeconds <= 300) return "status-urgent";
+      if (totalSeconds < 600) return "status-soon";
+      if (totalSeconds <= 1200) return "status-medium";
+      if (totalSeconds <= 1800) return "status-near";
+      return "status-later";
+    }
+
+    function renderDashboard() {
+      const dashboard = document.getElementById("dashboard");
+
+      routes.forEach((route, index) => {
+        const id = routeDomId(route, index);
+        dashboard.insertAdjacentHTML("beforeend", `
+          <article class="next-bus-card status-none" id="card-${id}" title="${escapeHtml(route.line)}">
+            <h3 class="route-name">${escapeHtml(route.line)}</h3>
+            <div class="compact-departure next-departure">
+              <span class="compact-label">Next</span>
+              <time class="compact-time next-time">Checking…</time>
+              <span class="countdown-badge next-countdown">—</span>
+            </div>
+            <div class="compact-departure following-departure">
+              <span class="compact-label">Then</span>
+              <time class="compact-time following-time">Checking…</time>
+            </div>
+          </article>
+        `);
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("bus-table-body");
+
+      routes.forEach((route, routeIndex) => {
+        const id = routeDomId(route, routeIndex);
+        const collapseId = `schedule-${id}`;
+        const scheduleGroups = route.schedules.map((schedule, scheduleIndex) => {
+          const externalLink = schedule.link && schedule.link !== "#"
+            ? `<a class="btn btn-sm btn-outline-secondary" href="${escapeHtml(schedule.link)}" target="_blank" rel="noopener">Source</a>`
+            : "";
+
+          const timeChips = schedule.times.map(time => `
+            <time class="time-chip" data-time="${escapeHtml(time)}">${escapeHtml(time)}</time>
+          `).join("");
+
+          return `
+            <div class="schedule-group" data-route-index="${routeIndex}" data-schedule-index="${scheduleIndex}">
+              <div class="schedule-title-row">
+                <h3 class="schedule-title">${escapeHtml(schedule.title)}</h3>
+                ${externalLink}
+              </div>
+              <div class="times">${timeChips}</div>
+            </div>
+          `;
+        }).join("");
+
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td class="route-cell">${escapeHtml(route.line)}</td>
+            <td class="d-none d-sm-table-cell">${escapeHtml(route.destination)}</td>
+            <td class="fare-cell">${escapeHtml(route.fareCash)}</td>
+            <td class="fare-cell d-none d-md-table-cell">${escapeHtml(route.fareMasar)}</td>
+            <td class="text-end">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary schedule-toggle"
+                data-bs-toggle="collapse"
+                data-bs-target="#${collapseId}"
+                aria-expanded="false"
+                aria-controls="${collapseId}"
+              >
+                View times
+              </button>
+            </td>
+          </tr>
+          <tr class="collapse schedule-details" id="${collapseId}">
+            <td colspan="5">
+              <div class="schedule-details-inner">${scheduleGroups}</div>
+            </td>
+          </tr>
+        `);
+      });
+    }
+
+    function updateDashboard(now = new Date()) {
+      document.getElementById("current-clock").textContent = formatClockTime(now, true);
+      document.getElementById("current-clock").dateTime = now.toISOString();
+
+      routes.forEach((route, index) => {
+        const card = document.getElementById(`card-${routeDomId(route, index)}`);
+        if (!card) return;
+
+        const departures = getUpcomingDepartures(route, now, 2);
+        const next = departures[0];
+        const following = departures[1];
+
+        card.classList.remove(...STATUS_CLASSES, "urgent-flash");
+
+        if (!next) {
+          card.classList.add("status-none");
+          card.querySelector(".next-time").textContent = "No service found";
+          card.querySelector(".next-countdown").textContent = "—";
+          card.querySelector(".following-time").textContent = "—";
+          return;
         }
-        return time;
-      }).join(", ");
-    });
-  }
 
-  // Init
-  findNextPerLine();
-  highlightUpcoming();
-  setInterval(() => {
-    findNextPerLine();
-    highlightUpcoming();
-  }, 10000);
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    initMobileFullscreen();
-    // Enable tap/click on rows to show timings
-    document.querySelectorAll("tr.clickable-row").forEach(row => {
-      row.addEventListener("click", () => {
-        const target = row.getAttribute("data-bs-target");
-        if (target) {
-          const collapseEl = document.querySelector(target);
-          if (collapseEl) {
-            const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: true });
+        const totalSecondsToNext = secondsUntil(next.date, now);
+        const currentStatus = statusClass(totalSecondsToNext);
+        const isUrgent = totalSecondsToNext <= 5 * 60;
+
+        card.classList.add(currentStatus);
+        card.classList.toggle("urgent-flash", isUrgent);
+
+        const nextTime = card.querySelector(".next-time");
+        nextTime.textContent = formatDeparture(next.date, now);
+        nextTime.dateTime = next.date.toISOString();
+        card.querySelector(".next-countdown").textContent = formatCountdown(totalSecondsToNext);
+
+        const followingTime = card.querySelector(".following-time");
+        if (following) {
+          followingTime.textContent = formatDeparture(following.date, now);
+          followingTime.dateTime = following.date.toISOString();
+
+        } else {
+          followingTime.textContent = "No later service found";
+          followingTime.removeAttribute("datetime");
+
+        }
+
+        const routeKey = route.line;
+        const wasUrgent = previousUrgentState.get(routeKey) === true;
+        if (isUrgent && !wasUrgent) {
+          const nowMs = Date.now();
+          const previousVibration = lastVibrationAt.get(routeKey) || 0;
+          if ("vibrate" in navigator && nowMs - previousVibration > 60000) {
+            navigator.vibrate([180, 100, 180]);
+            lastVibrationAt.set(routeKey, nowMs);
           }
         }
+        previousUrgentState.set(routeKey, isUrgent);
       });
-    });
-  });
-
-
-
-// Auto full-screen on mobile (requires a user gesture in most browsers).
-// We do it on the first tap/click and also show a small button as a fallback.
-function initMobileFullscreen() {
-  const isMobile = window.matchMedia("(max-width: 768px)").matches ||
-    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  if (!isMobile) return;
-
-  const fsEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled || document.msFullscreenEnabled;
-  if (!fsEnabled) return;
-
-  const requestFs = () => {
-    const el = document.documentElement;
-    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    if (!fn) return Promise.reject(new Error("Fullscreen not supported"));
-    try {
-      const r = fn.call(el);
-      return (r && typeof r.then === "function") ? r : Promise.resolve();
-    } catch (e) {
-      return Promise.reject(e);
     }
-  };
 
-  // Fallback button (in case the first tap happens on something that shouldn't trigger FS)
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "btn btn-sm btn-light position-fixed bottom-0 start-50 translate-middle-x mb-3 shadow";
-  btn.style.zIndex = "9999";
-  btn.textContent = "⛶ Full screen";
-  btn.addEventListener("click", () => requestFs().then(() => btn.remove()).catch(() => {}));
-  document.body.appendChild(btn);
+    function updateTableHighlights(now = new Date()) {
+      document.querySelectorAll(".schedule-group").forEach(group => {
+        const routeIndex = Number(group.dataset.routeIndex);
+        const scheduleIndex = Number(group.dataset.scheduleIndex);
+        const schedule = routes[routeIndex].schedules[scheduleIndex];
+        const serviceDate = startOfDay(now);
+        const appliesToday = scheduleAppliesToDate(schedule, serviceDate);
 
-  const tryOnce = () => {
-    if (document.fullscreenElement || document.webkitFullscreenElement) return;
-    requestFs().then(() => btn.remove()).catch(() => {});
-  };
+        const chips = [...group.querySelectorAll(".time-chip")];
+        chips.forEach(chip => chip.classList.remove("is-next", "is-following", "is-past"));
 
-  // First user gesture -> try full-screen
-  document.addEventListener("touchstart", tryOnce, { once: true, passive: true });
-  document.addEventListener("click", tryOnce, { once: true });
+        if (!appliesToday) return;
 
-  // If user exits full-screen, show button again
-  const onFsChange = () => {
-    const inFs = document.fullscreenElement || document.webkitFullscreenElement;
-    if (!inFs && !document.body.contains(btn)) document.body.appendChild(btn);
-    if (inFs && document.body.contains(btn)) btn.remove();
-  };
-  document.addEventListener("fullscreenchange", onFsChange);
-  document.addEventListener("webkitfullscreenchange", onFsChange);
-}
+        const futureChips = [];
+        chips.forEach(chip => {
+          const departure = timeOnServiceDate(chip.dataset.time, serviceDate, schedule);
+          if (departure <= now) chip.classList.add("is-past");
+          else futureChips.push(chip);
+        });
 
-  // Dashboard urgency color function
-  function getColor(diffMinutes) {
-    if (diffMinutes <= 8) return "red";
-    if (diffMinutes <= 10) return "orange";
-    if (diffMinutes <= 30) return "green";
-    return "blue";
-  }
-</script>
+        futureChips[0]?.classList.add("is-next");
+        futureChips[1]?.classList.add("is-following");
+      });
+    }
+
+    function initFullscreenButton() {
+      const button = document.getElementById("fullscreen-button");
+      const requestFullscreen = document.documentElement.requestFullscreen
+        || document.documentElement.webkitRequestFullscreen;
+
+      if (!requestFullscreen) {
+        button.remove();
+        return;
+      }
+
+      button.addEventListener("click", async () => {
+        try {
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            await exit.call(document);
+          } else {
+            await requestFullscreen.call(document.documentElement);
+          }
+        } catch (error) {
+          console.warn("Fullscreen request was not completed.", error);
+        }
+      });
+
+      const syncLabel = () => {
+        const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+        button.textContent = isFullscreen ? "× Exit full screen" : "⛶ Full screen";
+      };
+
+      document.addEventListener("fullscreenchange", syncLabel);
+      document.addEventListener("webkitfullscreenchange", syncLabel);
+    }
+
+    function init() {
+      renderDashboard();
+      renderTable();
+      initFullscreenButton();
+
+      const now = new Date();
+      updateDashboard(now);
+      updateTableHighlights(now);
+      lastHighlightedMinute = now.getMinutes();
+
+      window.setInterval(() => {
+        const tick = new Date();
+        updateDashboard(tick);
+
+        if (tick.getMinutes() !== lastHighlightedMinute) {
+          updateTableHighlights(tick);
+          lastHighlightedMinute = tick.getMinutes();
+        }
+      }, 1000);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
 </body>
 </html>
