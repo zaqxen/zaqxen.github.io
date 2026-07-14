@@ -629,6 +629,190 @@
         text-transform: uppercase;
       }
     }
+
+
+    /* Swipe-left notification controls. The action tray sits behind the row, so
+       route height stays unchanged. */
+    .next-bus-card {
+      --actions-width: 224px;
+      display: block;
+      position: relative;
+      padding: 0;
+      background: var(--surface-muted);
+      touch-action: pan-y;
+    }
+
+    .next-bus-card.has-reminder { --actions-width: 146px; }
+
+    .card-content {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(150px, 1fr) minmax(170px, auto) minmax(145px, auto);
+      align-items: center;
+      gap: 0.8rem;
+      min-height: 46px;
+      padding: 0.38rem 0.7rem;
+      background: var(--surface);
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+      transition: transform 180ms ease;
+      will-change: transform;
+    }
+
+    .next-bus-card.actions-open .card-content {
+      transform: translateX(calc(-1 * var(--actions-width)));
+    }
+
+    .next-bus-card.is-dragging .card-content {
+      cursor: grabbing;
+      transition: none;
+    }
+
+    .notification-actions {
+      position: absolute;
+      z-index: 1;
+      inset: 0 0 0 auto;
+      display: flex;
+      width: var(--actions-width);
+      min-width: 0;
+      align-items: stretch;
+      justify-content: flex-end;
+      background: #eef2f7;
+    }
+
+    .reminder-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      width: 100%;
+    }
+
+    .reminder-action,
+    .reminder-cancel {
+      min-width: 0;
+      border: 0;
+      border-left: 1px solid #d7dee8;
+      border-radius: 0;
+      font: inherit;
+      font-size: 0.68rem;
+      font-weight: 800;
+      line-height: 1.05;
+      touch-action: manipulation;
+    }
+
+    .reminder-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.12rem;
+      padding: 0.2rem 0.24rem;
+      background: #e8f1ff;
+      color: #1d4ed8;
+    }
+
+    .reminder-action strong {
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reminder-action:hover,
+    .reminder-action:focus-visible { background: #dbeafe; }
+
+    .reminder-cancel {
+      display: none;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 0.45rem;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .reminder-cancel:hover,
+    .reminder-cancel:focus-visible { background: #fecaca; }
+
+    .next-bus-card.has-reminder .reminder-options { display: none; }
+    .next-bus-card.has-reminder .reminder-cancel { display: flex; }
+
+    .reminder-action:disabled,
+    .reminder-cancel:disabled {
+      cursor: wait;
+      opacity: 0.55;
+    }
+
+    .reminder-indicator {
+      display: none;
+      flex: 0 0 auto;
+      align-items: center;
+      padding: 0.16rem 0.3rem;
+      border-radius: 999px;
+      background: #ede9fe;
+      color: #6d28d9;
+      font-size: 0.58rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .next-bus-card.has-reminder .reminder-indicator { display: inline-flex; }
+
+    .notification-toast {
+      position: fixed;
+      z-index: 2000;
+      left: 50%;
+      bottom: 1rem;
+      width: min(92vw, 520px);
+      padding: 0.7rem 0.85rem;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      background: #172033;
+      color: #fff;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.3);
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.35;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 0.65rem);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .notification-toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .notification-toast.is-error {
+      border-color: #ef4444;
+      background: #7f1d1d;
+    }
+
+    @media (max-width: 767.98px) {
+      .next-bus-card { --actions-width: 190px; }
+      .next-bus-card.has-reminder { --actions-width: 124px; }
+
+      .card-content {
+        grid-template-columns: minmax(112px, 1fr) minmax(128px, auto) minmax(94px, auto);
+        gap: 0.35rem;
+        min-height: 40px;
+        padding: 0.3rem 0.42rem;
+      }
+
+      .reminder-action,
+      .reminder-cancel { font-size: 0.58rem; }
+      .reminder-action strong { font-size: 0.68rem; }
+    }
+
+    @media (max-width: 430px) {
+      .card-content {
+        grid-template-columns: minmax(105px, 1fr) minmax(122px, auto) minmax(84px, auto);
+      }
+
+      .reminder-indicator { font-size: 0.52rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -680,6 +864,8 @@
   <button id="fullscreen-button" type="button" class="btn fullscreen-button" aria-label="Open full screen">
     ⛶ Full screen
   </button>
+
+  <div id="notification-toast" class="notification-toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -744,9 +930,12 @@
       "status-none"
     ];
 
-    const previousUrgentState = new Map();
-    const lastVibrationAt = new Map();
+    const REMINDER_STORAGE_KEY = "ajman-bus-reminders-v1";
+    const remindersByRoute = new Map();
+    let serviceWorkerRegistration = null;
     let lastHighlightedMinute = -1;
+    let toastTimer = 0;
+    let reminderCheckInProgress = false;
 
     function escapeHtml(value) {
       return String(value)
@@ -905,22 +1094,440 @@
       return "status-later";
     }
 
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById("notification-toast");
+      if (!toast) return;
+
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.toggle("is-error", isError);
+      toast.classList.add("is-visible");
+      toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 4200);
+    }
+
+    function loadReminders() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(REMINDER_STORAGE_KEY) || "[]");
+        if (!Array.isArray(stored)) return;
+
+        stored.forEach(reminder => {
+          if (!reminder || typeof reminder.routeId !== "string") return;
+          if (!Number.isFinite(reminder.departureTimestamp)) return;
+          if (![5, 10, 15].includes(reminder.thresholdMinutes)) return;
+          remindersByRoute.set(reminder.routeId, reminder);
+        });
+      } catch (error) {
+        console.warn("Saved bus reminders could not be loaded.", error);
+      }
+    }
+
+    function saveReminders() {
+      try {
+        localStorage.setItem(
+          REMINDER_STORAGE_KEY,
+          JSON.stringify([...remindersByRoute.values()])
+        );
+      } catch (error) {
+        console.warn("Bus reminders could not be saved.", error);
+      }
+    }
+
+    async function registerNotificationServiceWorker(showError = false) {
+      if (serviceWorkerRegistration) return serviceWorkerRegistration;
+      if (!window.isSecureContext || !("serviceWorker" in navigator)) return null;
+
+      try {
+        serviceWorkerRegistration = await navigator.serviceWorker.register("./service-worker.js", {
+          scope: "./"
+        });
+        return serviceWorkerRegistration;
+      } catch (error) {
+        console.warn("Notification service worker registration failed.", error);
+        if (showError) {
+          showToast("Notifications need this page to be served over HTTPS with service-worker.js in the same folder.", true);
+        }
+        return null;
+      }
+    }
+
+    async function ensureNotificationPermission() {
+      if (!("Notification" in window)) {
+        showToast("This browser does not support web notifications.", true);
+        return false;
+      }
+
+      if (!window.isSecureContext) {
+        showToast("Mobile notifications require HTTPS or localhost. They cannot run directly from a file:// page.", true);
+        return false;
+      }
+
+      let permission = Notification.permission;
+      if (permission === "default") {
+        try {
+          permission = await Notification.requestPermission();
+        } catch (error) {
+          console.warn("Notification permission request failed.", error);
+          showToast("The notification permission request could not be completed.", true);
+          return false;
+        }
+      }
+
+      if (permission !== "granted") {
+        const message = permission === "denied"
+          ? "Notifications are blocked. Enable them for this site in your browser settings."
+          : "Notification permission was not enabled.";
+        showToast(message, true);
+        return false;
+      }
+
+      // Mobile browsers generally require ServiceWorkerRegistration.showNotification().
+      const registration = await registerNotificationServiceWorker(false);
+      const likelyMobile = window.matchMedia("(pointer: coarse)").matches
+        || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+      if (likelyMobile && !(registration && "showNotification" in registration)) {
+        showToast("Mobile notifications require service-worker.js and HTTPS. Keep both files in the same folder on your server.", true);
+        return false;
+      }
+
+      return true;
+    }
+
+    function syncReminderCard(routeId) {
+      const card = document.getElementById(`card-${routeId}`);
+      if (!card) return;
+
+      const reminder = remindersByRoute.get(routeId);
+      card.classList.toggle("has-reminder", Boolean(reminder));
+
+      const indicator = card.querySelector(".reminder-indicator");
+      if (reminder) {
+        indicator.textContent = "🔔";
+        indicator.title = `${reminder.thresholdMinutes}-minute notification active`;
+        indicator.setAttribute("aria-label", `${reminder.thresholdMinutes}-minute notification active`);
+      } else {
+        indicator.textContent = "";
+        indicator.removeAttribute("title");
+        indicator.setAttribute("aria-label", "No notification active");
+      }
+    }
+
+    function syncAllReminderCards() {
+      document.querySelectorAll(".next-bus-card").forEach(card => {
+        syncReminderCard(card.dataset.routeId);
+      });
+    }
+
+    function closeCardActions(card) {
+      if (!card) return;
+      card.classList.remove("actions-open", "is-dragging");
+      const content = card.querySelector(".card-content");
+      if (content) content.style.removeProperty("transform");
+    }
+
+    function closeAllCardActions(exceptCard = null) {
+      document.querySelectorAll(".next-bus-card.actions-open").forEach(card => {
+        if (card !== exceptCard) closeCardActions(card);
+      });
+    }
+
+    function openCardActions(card) {
+      closeAllCardActions(card);
+      card.classList.add("actions-open");
+    }
+
+    function getActionWidth(card) {
+      return card.querySelector(".notification-actions")?.getBoundingClientRect().width || 0;
+    }
+
+    function initSwipeActions() {
+      document.querySelectorAll(".next-bus-card").forEach(card => {
+        const content = card.querySelector(".card-content");
+        let pointerId = null;
+        let startX = 0;
+        let startY = 0;
+        let startOffset = 0;
+        let currentOffset = 0;
+        let horizontalDrag = false;
+        let moved = false;
+
+        const finishDrag = event => {
+          if (pointerId === null || (event.pointerId !== undefined && event.pointerId !== pointerId)) return;
+
+          const width = getActionWidth(card);
+          const deltaX = event.clientX - startX;
+          const shouldOpen = horizontalDrag && (
+            currentOffset < -width * 0.42
+            || deltaX < -38
+          );
+          const shouldClose = horizontalDrag && deltaX > 38;
+
+          card.classList.remove("is-dragging");
+          content.style.removeProperty("transform");
+
+          if (shouldClose) closeCardActions(card);
+          else if (shouldOpen) openCardActions(card);
+          else if (startOffset < 0) openCardActions(card);
+          else closeCardActions(card);
+
+          if (moved) {
+            content.dataset.ignoreClick = "true";
+            window.setTimeout(() => delete content.dataset.ignoreClick, 0);
+          }
+
+          try { content.releasePointerCapture(pointerId); } catch (_) {}
+          pointerId = null;
+        };
+
+        content.addEventListener("pointerdown", event => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+
+          closeAllCardActions(card);
+          pointerId = event.pointerId;
+          startX = event.clientX;
+          startY = event.clientY;
+          startOffset = card.classList.contains("actions-open") ? -getActionWidth(card) : 0;
+          currentOffset = startOffset;
+          horizontalDrag = false;
+          moved = false;
+          content.setPointerCapture(pointerId);
+        });
+
+        content.addEventListener("pointermove", event => {
+          if (pointerId !== event.pointerId) return;
+
+          const deltaX = event.clientX - startX;
+          const deltaY = event.clientY - startY;
+
+          if (!horizontalDrag) {
+            if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 8) return;
+            if (Math.abs(deltaX) < 7) return;
+            horizontalDrag = true;
+            card.classList.add("is-dragging");
+          }
+
+          event.preventDefault();
+          moved = true;
+          const width = getActionWidth(card);
+          currentOffset = Math.max(-width, Math.min(0, startOffset + deltaX));
+          content.style.transform = `translateX(${currentOffset}px)`;
+        });
+
+        content.addEventListener("pointerup", finishDrag);
+        content.addEventListener("pointercancel", finishDrag);
+
+        content.addEventListener("click", event => {
+          if (content.dataset.ignoreClick === "true") {
+            event.preventDefault();
+            return;
+          }
+          if (card.classList.contains("actions-open")) closeCardActions(card);
+        });
+
+        content.addEventListener("keydown", event => {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            openCardActions(card);
+          } else if (event.key === "ArrowRight" || event.key === "Escape") {
+            event.preventDefault();
+            closeCardActions(card);
+          }
+        });
+
+        card.querySelectorAll(".reminder-action").forEach(button => {
+          button.addEventListener("click", async event => {
+            event.stopPropagation();
+            const minutes = Number(button.dataset.minutes);
+            await setRouteReminder(card, minutes);
+          });
+        });
+
+        card.querySelector(".reminder-cancel").addEventListener("click", event => {
+          event.stopPropagation();
+          cancelRouteReminder(card);
+        });
+      });
+
+      document.addEventListener("pointerdown", event => {
+        if (!event.target.closest(".next-bus-card")) closeAllCardActions();
+      });
+    }
+
+    function setReminderButtonsDisabled(card, disabled) {
+      card.querySelectorAll(".reminder-action, .reminder-cancel").forEach(button => {
+        button.disabled = disabled;
+      });
+    }
+
+    async function setRouteReminder(card, thresholdMinutes) {
+      if (![5, 10, 15].includes(thresholdMinutes)) return;
+
+      const routeIndex = Number(card.dataset.routeIndex);
+      const route = routes[routeIndex];
+      if (!route) return;
+
+      setReminderButtonsDisabled(card, true);
+      try {
+        const permissionEnabled = await ensureNotificationPermission();
+        if (!permissionEnabled) return;
+
+        const now = new Date();
+        const next = getUpcomingDepartures(route, now, 1)[0];
+        if (!next) {
+          showToast(`No upcoming departure was found for ${route.line}.`, true);
+          return;
+        }
+
+        const routeId = card.dataset.routeId;
+        const reminder = {
+          routeId,
+          routeIndex,
+          line: route.line,
+          departureTimestamp: next.date.getTime(),
+          thresholdMinutes,
+          notified: false,
+          createdAt: Date.now()
+        };
+
+        remindersByRoute.set(routeId, reminder);
+        saveReminders();
+        syncReminderCard(routeId);
+        closeCardActions(card);
+
+        const remainingSeconds = secondsUntil(next.date, now);
+        if (remainingSeconds <= thresholdMinutes * 60) {
+          showToast(`${route.line} is already within ${thresholdMinutes} minutes. Notifying now.`);
+        } else {
+          showToast(`Notification set for ${route.line} at ${thresholdMinutes} minutes before ${formatDeparture(next.date, now)}.`);
+        }
+
+        await checkReminders(now);
+      } finally {
+        setReminderButtonsDisabled(card, false);
+      }
+    }
+
+    function cancelRouteReminder(card) {
+      const routeId = card.dataset.routeId;
+      const reminder = remindersByRoute.get(routeId);
+      remindersByRoute.delete(routeId);
+      saveReminders();
+      syncReminderCard(routeId);
+      closeCardActions(card);
+      showToast(reminder ? `Notification cancelled for ${reminder.line}.` : "Notification cancelled.");
+    }
+
+    async function displayBusNotification(reminder, now) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return false;
+
+      const departure = new Date(reminder.departureTimestamp);
+      const remainingSeconds = secondsUntil(departure, now);
+      const title = `${reminder.line}: ${formatCountdown(remainingSeconds)} to departure`;
+      const options = {
+        body: `Departs at ${formatDeparture(departure, now)}.`,
+        tag: `ajman-bus-${reminder.routeId}-${reminder.departureTimestamp}`,
+        renotify: false,
+        timestamp: reminder.departureTimestamp,
+        vibrate: [180, 100, 180],
+        data: { url: window.location.href }
+      };
+
+      try {
+        const registration = serviceWorkerRegistration || await registerNotificationServiceWorker(false);
+        if (registration && "showNotification" in registration) {
+          await registration.showNotification(title, options);
+        } else {
+          const notification = new Notification(title, options);
+          notification.onclick = () => {
+            window.focus();
+            notification.close();
+          };
+        }
+
+        if ("vibrate" in navigator) navigator.vibrate([180, 100, 180]);
+        return true;
+      } catch (error) {
+        console.warn("Bus notification could not be displayed.", error);
+        showToast("The notification could not be displayed. Keep this page open and check browser notification settings.", true);
+        return false;
+      }
+    }
+
+    async function checkReminders(now = new Date()) {
+      if (reminderCheckInProgress) return;
+      reminderCheckInProgress = true;
+      let changed = false;
+
+      try {
+        for (const [routeId, reminder] of [...remindersByRoute.entries()]) {
+          const departure = new Date(reminder.departureTimestamp);
+
+          if (!Number.isFinite(departure.getTime()) || departure <= now) {
+            remindersByRoute.delete(routeId);
+            syncReminderCard(routeId);
+            changed = true;
+            continue;
+          }
+
+          const triggerTimestamp = reminder.departureTimestamp - reminder.thresholdMinutes * 60 * 1000;
+          if (!reminder.notified && now.getTime() >= triggerTimestamp) {
+            const delivered = await displayBusNotification(reminder, now);
+            if (delivered) {
+              reminder.notified = true;
+              remindersByRoute.set(routeId, reminder);
+              syncReminderCard(routeId);
+              changed = true;
+            }
+          }
+        }
+      } finally {
+        if (changed) saveReminders();
+        reminderCheckInProgress = false;
+      }
+    }
+
     function renderDashboard() {
       const dashboard = document.getElementById("dashboard");
 
       routes.forEach((route, index) => {
         const id = routeDomId(route, index);
         dashboard.insertAdjacentHTML("beforeend", `
-          <article class="next-bus-card status-none" id="card-${id}" title="${escapeHtml(route.line)}">
-            <h3 class="route-name">${escapeHtml(route.line)}</h3>
-            <div class="compact-departure next-departure">
-              <span class="compact-label">Next</span>
-              <time class="compact-time next-time">Checking…</time>
-              <span class="countdown-badge next-countdown">—</span>
+          <article
+            class="next-bus-card status-none"
+            id="card-${id}"
+            data-route-id="${id}"
+            data-route-index="${index}"
+            title="Swipe left to set a notification for ${escapeHtml(route.line)}"
+          >
+            <div class="notification-actions" aria-label="${escapeHtml(route.line)} notification controls">
+              <div class="reminder-options">
+                <button type="button" class="reminder-action" data-minutes="5" aria-label="Notify me 5 minutes before ${escapeHtml(route.line)} departs">
+                  <span>Notify</span><strong>5 min</strong>
+                </button>
+                <button type="button" class="reminder-action" data-minutes="10" aria-label="Notify me 10 minutes before ${escapeHtml(route.line)} departs">
+                  <span>Notify</span><strong>10 min</strong>
+                </button>
+                <button type="button" class="reminder-action" data-minutes="15" aria-label="Notify me 15 minutes before ${escapeHtml(route.line)} departs">
+                  <span>Notify</span><strong>15 min</strong>
+                </button>
+              </div>
+              <button type="button" class="reminder-cancel" aria-label="Cancel notification for ${escapeHtml(route.line)}">
+                Cancel notification
+              </button>
             </div>
-            <div class="compact-departure following-departure">
-              <span class="compact-label">Then</span>
-              <time class="compact-time following-time">Checking…</time>
+            <div class="card-content" tabindex="0" role="group" aria-label="${escapeHtml(route.line)}. Swipe left for notification options">
+              <h3 class="route-name">${escapeHtml(route.line)}</h3>
+              <div class="compact-departure next-departure">
+                <span class="compact-label">Next</span>
+                <time class="compact-time next-time">Checking…</time>
+                <span class="countdown-badge next-countdown">—</span>
+                <span class="reminder-indicator" aria-label="Notification active"></span>
+              </div>
+              <div class="compact-departure following-departure">
+                <span class="compact-label">Then</span>
+                <time class="compact-time following-time">Checking…</time>
+              </div>
             </div>
           </article>
         `);
@@ -1026,17 +1633,6 @@
 
         }
 
-        const routeKey = route.line;
-        const wasUrgent = previousUrgentState.get(routeKey) === true;
-        if (isUrgent && !wasUrgent) {
-          const nowMs = Date.now();
-          const previousVibration = lastVibrationAt.get(routeKey) || 0;
-          if ("vibrate" in navigator && nowMs - previousVibration > 60000) {
-            navigator.vibrate([180, 100, 180]);
-            lastVibrationAt.set(routeKey, nowMs);
-          }
-        }
-        previousUrgentState.set(routeKey, isUrgent);
       });
     }
 
@@ -1098,17 +1694,26 @@
     }
 
     function init() {
+      loadReminders();
       renderDashboard();
       renderTable();
       initFullscreenButton();
+      initSwipeActions();
+      syncAllReminderCards();
+
+      // Registration is attempted quietly. Permission is requested only after a
+      // reminder button is tapped, as required by mobile browsers.
+      registerNotificationServiceWorker(false);
 
       const now = new Date();
+      checkReminders(now);
       updateDashboard(now);
       updateTableHighlights(now);
       lastHighlightedMinute = now.getMinutes();
 
       window.setInterval(() => {
         const tick = new Date();
+        checkReminders(tick);
         updateDashboard(tick);
 
         if (tick.getMinutes() !== lastHighlightedMinute) {
@@ -1116,6 +1721,11 @@
           lastHighlightedMinute = tick.getMinutes();
         }
       }, 1000);
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) checkReminders(new Date());
+      });
+      window.addEventListener("focus", () => checkReminders(new Date()));
     }
 
     document.addEventListener("DOMContentLoaded", init);
