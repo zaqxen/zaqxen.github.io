@@ -631,10 +631,12 @@
     }
 
 
-    /* Swipe-left notification controls. The action tray sits behind the row, so
-       route height stays unchanged. */
+    /* Two-sided swipe controls.
+       Swipe right reveals notification controls on the left.
+       Swipe left reveals PIN / UNPIN on the right. */
     .next-bus-card {
-      --actions-width: 224px;
+      --notification-actions-width: 224px;
+      --pin-actions-width: 132px;
       display: block;
       position: relative;
       padding: 0;
@@ -642,7 +644,7 @@
       touch-action: pan-y;
     }
 
-    .next-bus-card.has-reminder { --actions-width: 146px; }
+    .next-bus-card.has-reminder { --notification-actions-width: 146px; }
 
     .card-content {
       position: relative;
@@ -657,12 +659,16 @@
       cursor: grab;
       touch-action: pan-y;
       user-select: none;
-      transition: transform 180ms ease;
+      transition: transform 180ms ease, min-height 180ms ease, padding 180ms ease;
       will-change: transform;
     }
 
-    .next-bus-card.actions-open .card-content {
-      transform: translateX(calc(-1 * var(--actions-width)));
+    .next-bus-card.notification-open .card-content {
+      transform: translateX(var(--notification-actions-width));
+    }
+
+    .next-bus-card.pin-open .card-content {
+      transform: translateX(calc(-1 * var(--pin-actions-width)));
     }
 
     .next-bus-card.is-dragging .card-content {
@@ -670,16 +676,29 @@
       transition: none;
     }
 
-    .notification-actions {
+    .notification-actions,
+    .pin-actions {
       position: absolute;
       z-index: 1;
-      inset: 0 0 0 auto;
+      top: 0;
+      bottom: 0;
       display: flex;
-      width: var(--actions-width);
       min-width: 0;
       align-items: stretch;
-      justify-content: flex-end;
+    }
+
+    .notification-actions {
+      left: 0;
+      width: var(--notification-actions-width);
+      justify-content: flex-start;
       background: #eef2f7;
+    }
+
+    .pin-actions {
+      right: 0;
+      width: var(--pin-actions-width);
+      justify-content: stretch;
+      background: #fef3c7;
     }
 
     .reminder-options {
@@ -689,16 +708,21 @@
     }
 
     .reminder-action,
-    .reminder-cancel {
+    .reminder-cancel,
+    .pin-action {
       min-width: 0;
       border: 0;
-      border-left: 1px solid #d7dee8;
       border-radius: 0;
       font: inherit;
       font-size: 0.68rem;
       font-weight: 800;
       line-height: 1.05;
       touch-action: manipulation;
+    }
+
+    .reminder-action,
+    .reminder-cancel {
+      border-right: 1px solid #d7dee8;
     }
 
     .reminder-action {
@@ -736,11 +760,52 @@
     .next-bus-card.has-reminder .reminder-options { display: none; }
     .next-bus-card.has-reminder .reminder-cancel { display: flex; }
 
+    .pin-action {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 0.32rem;
+      padding: 0.35rem 0.55rem;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.75rem;
+      font-weight: 900;
+    }
+
+    .pin-action:hover,
+    .pin-action:focus-visible { background: #fde68a; }
+
+    .next-bus-card.is-pinned .pin-action {
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
+    .next-bus-card.is-pinned .pin-action:hover,
+    .next-bus-card.is-pinned .pin-action:focus-visible { background: #fed7aa; }
+
     .reminder-action:disabled,
-    .reminder-cancel:disabled {
+    .reminder-cancel:disabled,
+    .pin-action:disabled {
       cursor: wait;
       opacity: 0.55;
     }
+
+    .route-title-wrap {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 0.42rem;
+    }
+
+    .pin-indicator {
+      display: none;
+      flex: 0 0 auto;
+      font-size: 0.75rem;
+      line-height: 1;
+    }
+
+    .next-bus-card.is-pinned .pin-indicator { display: inline; }
 
     .reminder-indicator {
       display: none;
@@ -757,6 +822,75 @@
     }
 
     .next-bus-card.has-reminder .reminder-indicator { display: inline-flex; }
+
+    .pinned-reminder-countdown {
+      display: none;
+      grid-column: 1 / -1;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      min-width: 0;
+      margin-top: 0.05rem;
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #c4b5fd;
+      border-radius: 0.7rem;
+      background: #f5f3ff;
+      color: #5b21b6;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pinned-reminder-countdown .reminder-countdown-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .pinned-reminder-countdown .reminder-countdown-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+    }
+
+    .next-bus-card.is-pinned.has-reminder .pinned-reminder-countdown { display: flex; }
+
+    /* Pinned routes are deliberately much larger and visually separated at the top. */
+    .next-bus-card.is-pinned {
+      margin: 0.38rem;
+      border: 1px solid #f59e0b;
+      border-left: 6px solid #f59e0b;
+      border-radius: 0.9rem;
+      overflow: hidden;
+      box-shadow: 0 7px 22px rgba(146, 64, 14, 0.13);
+    }
+
+    .next-bus-card.is-pinned + .next-bus-card:not(.is-pinned) {
+      border-top: 2px solid #d8dee8;
+    }
+
+    .next-bus-card.is-pinned .card-content {
+      grid-template-columns: minmax(190px, 1fr) minmax(190px, auto) minmax(160px, auto);
+      min-height: 86px;
+      gap: 0.9rem;
+      padding: 0.85rem 1rem;
+      background: #fffbeb;
+    }
+
+    .next-bus-card.is-pinned .route-name {
+      font-size: 1.08rem;
+      white-space: normal;
+      line-height: 1.15;
+    }
+
+    .next-bus-card.is-pinned .compact-label { font-size: 0.68rem; }
+    .next-bus-card.is-pinned .compact-time { font-size: 1rem; }
+    .next-bus-card.is-pinned .countdown-badge {
+      padding: 0.3rem 0.52rem;
+      font-size: 0.78rem;
+    }
 
     .notification-toast {
       position: fixed;
@@ -790,8 +924,11 @@
     }
 
     @media (max-width: 767.98px) {
-      .next-bus-card { --actions-width: 190px; }
-      .next-bus-card.has-reminder { --actions-width: 124px; }
+      .next-bus-card {
+        --notification-actions-width: 190px;
+        --pin-actions-width: 112px;
+      }
+      .next-bus-card.has-reminder { --notification-actions-width: 124px; }
 
       .card-content {
         grid-template-columns: minmax(112px, 1fr) minmax(128px, auto) minmax(94px, auto);
@@ -800,9 +937,27 @@
         padding: 0.3rem 0.42rem;
       }
 
+      .next-bus-card.is-pinned {
+        margin: 0.28rem;
+        border-left-width: 5px;
+      }
+
+      .next-bus-card.is-pinned .card-content {
+        grid-template-columns: minmax(118px, 1fr) minmax(125px, auto) minmax(96px, auto);
+        min-height: 76px;
+        gap: 0.4rem;
+        padding: 0.68rem 0.58rem;
+      }
+
+      .next-bus-card.is-pinned .route-name { font-size: 0.9rem; }
+      .next-bus-card.is-pinned .compact-time { font-size: 0.82rem; }
+      .pinned-reminder-countdown { padding: 0.45rem 0.55rem; }
+      .pinned-reminder-countdown .reminder-countdown-value { font-size: 1.05rem; }
+
       .reminder-action,
       .reminder-cancel { font-size: 0.58rem; }
       .reminder-action strong { font-size: 0.68rem; }
+      .pin-action { font-size: 0.66rem; }
     }
 
     @media (max-width: 430px) {
@@ -810,7 +965,14 @@
         grid-template-columns: minmax(105px, 1fr) minmax(122px, auto) minmax(84px, auto);
       }
 
+      .next-bus-card.is-pinned .card-content {
+        grid-template-columns: minmax(104px, 1fr) minmax(112px, auto) minmax(78px, auto);
+      }
+
+      .next-bus-card.is-pinned .compact-label { display: none; }
       .reminder-indicator { font-size: 0.52rem; }
+      .pinned-reminder-countdown .reminder-countdown-label { font-size: 0.58rem; }
+      .pinned-reminder-countdown .reminder-countdown-value { font-size: 0.92rem; }
     }
 
     /* All alarm behavior is implemented in this HTML file. */
@@ -1005,8 +1167,14 @@
     ];
 
     const REMINDER_STORAGE_KEY = "ajman-bus-reminders-v2";
+    const PINNED_ROUTES_STORAGE_KEY = "ajman-bus-pinned-routes-v1";
     const remindersByRoute = new Map();
+    const pinnedRouteIds = new Set();
+    const activeAlarmRouteIds = new Set();
     let alarmAudioContext = null;
+    let wakeLock = null;
+    let wakeLockRequestInProgress = false;
+    let wakeLockUnavailableWarned = false;
     let lastHighlightedMinute = -1;
     let toastTimer = 0;
     let reminderCheckInProgress = false;
@@ -1181,6 +1349,58 @@
       toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 4200);
     }
 
+    function hasActiveReminders() {
+      return remindersByRoute.size > 0;
+    }
+
+    async function acquireWakeLock() {
+      if (!hasActiveReminders() || document.hidden || wakeLock || wakeLockRequestInProgress) return;
+      if (!("wakeLock" in navigator) || !window.isSecureContext) {
+        if (!wakeLockUnavailableWarned) {
+          console.warn("Screen Wake Lock API is unavailable. Keep the page visible for reliable alarms.");
+          wakeLockUnavailableWarned = true;
+        }
+        return;
+      }
+
+      wakeLockRequestInProgress = true;
+      try {
+        const requestedLock = await navigator.wakeLock.request("screen");
+
+        // The reminder may have been canceled while the asynchronous request was pending.
+        if (!hasActiveReminders()) {
+          await requestedLock.release();
+          return;
+        }
+
+        wakeLock = requestedLock;
+        wakeLock.addEventListener("release", () => {
+          if (wakeLock === requestedLock) wakeLock = null;
+        });
+      } catch (error) {
+        console.warn("Screen wake lock could not be acquired.", error);
+      } finally {
+        wakeLockRequestInProgress = false;
+      }
+    }
+
+    async function releaseWakeLock() {
+      const lock = wakeLock;
+      wakeLock = null;
+      if (!lock) return;
+
+      try {
+        await lock.release();
+      } catch (error) {
+        console.warn("Screen wake lock could not be released cleanly.", error);
+      }
+    }
+
+    async function syncWakeLockWithReminders() {
+      if (hasActiveReminders()) await acquireWakeLock();
+      else await releaseWakeLock();
+    }
+
     function loadReminders() {
       try {
         const stored = JSON.parse(localStorage.getItem(REMINDER_STORAGE_KEY) || "[]");
@@ -1205,6 +1425,27 @@
         );
       } catch (error) {
         console.warn("Bus reminders could not be saved.", error);
+      }
+    }
+
+    function loadPinnedRoutes() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(PINNED_ROUTES_STORAGE_KEY) || "[]");
+        if (!Array.isArray(stored)) return;
+
+        stored.forEach(routeId => {
+          if (typeof routeId === "string") pinnedRouteIds.add(routeId);
+        });
+      } catch (error) {
+        console.warn("Pinned routes could not be loaded.", error);
+      }
+    }
+
+    function savePinnedRoutes() {
+      try {
+        localStorage.setItem(PINNED_ROUTES_STORAGE_KEY, JSON.stringify([...pinnedRouteIds]));
+      } catch (error) {
+        console.warn("Pinned routes could not be saved.", error);
       }
     }
 
@@ -1294,12 +1535,22 @@
       document.title = `🔔 ${title}`;
     }
 
-    function dismissAlarmBanner() {
+    async function dismissAlarmBanner() {
       const banner = document.getElementById("alarm-banner");
       if (banner) banner.hidden = true;
       document.title = originalDocumentTitle;
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       if ("vibrate" in navigator) navigator.vibrate(0);
+
+      // Dismissing the alarm completes every reminder currently represented by
+      // the single alarm banner. Other future reminders remain active.
+      for (const routeId of activeAlarmRouteIds) {
+        remindersByRoute.delete(routeId);
+        syncReminderCard(routeId);
+      }
+      activeAlarmRouteIds.clear();
+      saveReminders();
+      await syncWakeLockWithReminders();
     }
 
     function speakAlarm(message) {
@@ -1314,6 +1565,42 @@
         window.speechSynthesis.speak(utterance);
       } catch (error) {
         console.warn("Alarm speech could not be played.", error);
+      }
+    }
+
+    function updatePinnedReminderCountdown(card, now = new Date()) {
+      if (!card) return;
+
+      const panel = card.querySelector(".pinned-reminder-countdown");
+      const label = card.querySelector(".reminder-countdown-label");
+      const value = card.querySelector(".reminder-countdown-value");
+      if (!panel || !label || !value) return;
+
+      const routeId = card.dataset.routeId;
+      const reminder = remindersByRoute.get(routeId);
+      const isPinned = pinnedRouteIds.has(routeId);
+
+      if (!isPinned || !reminder) {
+        label.textContent = "Alarm in";
+        value.textContent = "";
+        return;
+      }
+
+      const triggerTimestamp = reminder.departureTimestamp - reminder.thresholdMinutes * 60 * 1000;
+      const secondsToNotification = Math.ceil((triggerTimestamp - now.getTime()) / 1000);
+
+      if (!reminder.notified && secondsToNotification > 0) {
+        label.textContent = "Alarm in";
+        value.textContent = formatCountdown(secondsToNotification);
+        panel.setAttribute("aria-label", `Notification alarm in ${formatCountdown(secondsToNotification)}`);
+      } else if (activeAlarmRouteIds.has(routeId) || reminder.notified) {
+        label.textContent = "Reminder";
+        value.textContent = "Alarm active";
+        panel.setAttribute("aria-label", "Notification alarm is active");
+      } else {
+        label.textContent = "Alarm in";
+        value.textContent = "Now";
+        panel.setAttribute("aria-label", "Notification alarm is due now");
       }
     }
 
@@ -1334,6 +1621,8 @@
         indicator.removeAttribute("title");
         indicator.setAttribute("aria-label", "No alarm active");
       }
+
+      updatePinnedReminderCountdown(card);
     }
 
     function syncAllReminderCards() {
@@ -1342,26 +1631,97 @@
       });
     }
 
+    function sortDashboardCards() {
+      const dashboard = document.getElementById("dashboard");
+      if (!dashboard) return;
+
+      const cards = [...dashboard.querySelectorAll(".next-bus-card")];
+      cards.sort((a, b) => {
+        const aPinned = pinnedRouteIds.has(a.dataset.routeId) ? 1 : 0;
+        const bPinned = pinnedRouteIds.has(b.dataset.routeId) ? 1 : 0;
+        if (aPinned !== bPinned) return bPinned - aPinned;
+        return Number(a.dataset.routeIndex) - Number(b.dataset.routeIndex);
+      });
+
+      cards.forEach(card => dashboard.appendChild(card));
+    }
+
+    function syncPinCard(routeId) {
+      const card = document.getElementById(`card-${routeId}`);
+      if (!card) return;
+
+      const isPinned = pinnedRouteIds.has(routeId);
+      card.classList.toggle("is-pinned", isPinned);
+
+      const button = card.querySelector(".pin-action");
+      if (button) {
+        button.innerHTML = isPinned ? "<span>📌</span><span>UNPIN</span>" : "<span>📌</span><span>PIN</span>";
+        button.setAttribute("aria-label", `${isPinned ? "Unpin" : "Pin"} ${card.dataset.routeName || "route"}`);
+      }
+
+      const pinIndicator = card.querySelector(".pin-indicator");
+      if (pinIndicator) {
+        pinIndicator.title = isPinned ? "Pinned to top" : "";
+        pinIndicator.setAttribute("aria-hidden", isPinned ? "false" : "true");
+      }
+
+      updatePinnedReminderCountdown(card);
+    }
+
+    function syncAllPinCards() {
+      document.querySelectorAll(".next-bus-card").forEach(card => {
+        syncPinCard(card.dataset.routeId);
+      });
+      sortDashboardCards();
+    }
+
+    function toggleRoutePin(card) {
+      if (!card) return;
+      const routeId = card.dataset.routeId;
+      const routeName = card.dataset.routeName || "Route";
+      const willPin = !pinnedRouteIds.has(routeId);
+
+      if (willPin) pinnedRouteIds.add(routeId);
+      else pinnedRouteIds.delete(routeId);
+
+      savePinnedRoutes();
+      syncPinCard(routeId);
+      closeCardActions(card);
+      sortDashboardCards();
+      showToast(willPin ? `${routeName} pinned to the top.` : `${routeName} unpinned.`);
+    }
+
     function closeCardActions(card) {
       if (!card) return;
-      card.classList.remove("actions-open", "is-dragging");
+      card.classList.remove("notification-open", "pin-open", "is-dragging");
       const content = card.querySelector(".card-content");
       if (content) content.style.removeProperty("transform");
     }
 
     function closeAllCardActions(exceptCard = null) {
-      document.querySelectorAll(".next-bus-card.actions-open").forEach(card => {
+      document.querySelectorAll(".next-bus-card.notification-open, .next-bus-card.pin-open").forEach(card => {
         if (card !== exceptCard) closeCardActions(card);
       });
     }
 
-    function openCardActions(card) {
+    function openNotificationActions(card) {
       closeAllCardActions(card);
-      card.classList.add("actions-open");
+      card.classList.remove("pin-open");
+      card.classList.add("notification-open");
     }
 
-    function getActionWidth(card) {
+    function openPinActions(card) {
+      closeAllCardActions(card);
+      card.classList.remove("notification-open");
+      card.classList.add("pin-open");
+    }
+
+    function getNotificationActionWidth(card) {
       return card.querySelector(".notification-actions")?.getBoundingClientRect().width || 0;
+    }
+
+    function getPinActionWidth(card) {
+      return card.querySelector(".pin-actions")?.getBoundingClientRect().width || 0;
     }
 
     function initSwipeActions() {
@@ -1378,21 +1738,27 @@
         const finishDrag = event => {
           if (pointerId === null || (event.pointerId !== undefined && event.pointerId !== pointerId)) return;
 
-          const width = getActionWidth(card);
+          const notificationWidth = getNotificationActionWidth(card);
+          const pinWidth = getPinActionWidth(card);
           const deltaX = event.clientX - startX;
-          const shouldOpen = horizontalDrag && (
-            currentOffset < -width * 0.42
-            || deltaX < -38
-          );
-          const shouldClose = horizontalDrag && deltaX > 38;
 
           card.classList.remove("is-dragging");
           content.style.removeProperty("transform");
 
-          if (shouldClose) closeCardActions(card);
-          else if (shouldOpen) openCardActions(card);
-          else if (startOffset < 0) openCardActions(card);
-          else closeCardActions(card);
+          if (horizontalDrag) {
+            const openNotification = currentOffset > notificationWidth * 0.42 || deltaX > 38;
+            const openPin = currentOffset < -pinWidth * 0.42 || deltaX < -38;
+
+            if (openNotification && !openPin) openNotificationActions(card);
+            else if (openPin && !openNotification) openPinActions(card);
+            else closeCardActions(card);
+          } else if (startOffset > 0) {
+            openNotificationActions(card);
+          } else if (startOffset < 0) {
+            openPinActions(card);
+          } else {
+            closeCardActions(card);
+          }
 
           if (moved) {
             content.dataset.ignoreClick = "true";
@@ -1410,7 +1776,11 @@
           pointerId = event.pointerId;
           startX = event.clientX;
           startY = event.clientY;
-          startOffset = card.classList.contains("actions-open") ? -getActionWidth(card) : 0;
+          startOffset = card.classList.contains("notification-open")
+            ? getNotificationActionWidth(card)
+            : card.classList.contains("pin-open")
+              ? -getPinActionWidth(card)
+              : 0;
           currentOffset = startOffset;
           horizontalDrag = false;
           moved = false;
@@ -1432,8 +1802,9 @@
 
           event.preventDefault();
           moved = true;
-          const width = getActionWidth(card);
-          currentOffset = Math.max(-width, Math.min(0, startOffset + deltaX));
+          const notificationWidth = getNotificationActionWidth(card);
+          const pinWidth = getPinActionWidth(card);
+          currentOffset = Math.max(-pinWidth, Math.min(notificationWidth, startOffset + deltaX));
           content.style.transform = `translateX(${currentOffset}px)`;
         });
 
@@ -1445,14 +1816,19 @@
             event.preventDefault();
             return;
           }
-          if (card.classList.contains("actions-open")) closeCardActions(card);
+          if (card.classList.contains("notification-open") || card.classList.contains("pin-open")) {
+            closeCardActions(card);
+          }
         });
 
         content.addEventListener("keydown", event => {
-          if (event.key === "ArrowLeft") {
+          if (event.key === "ArrowRight") {
             event.preventDefault();
-            openCardActions(card);
-          } else if (event.key === "ArrowRight" || event.key === "Escape") {
+            openNotificationActions(card);
+          } else if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            openPinActions(card);
+          } else if (event.key === "Escape") {
             event.preventDefault();
             closeCardActions(card);
           }
@@ -1466,9 +1842,14 @@
           });
         });
 
-        card.querySelector(".reminder-cancel").addEventListener("click", event => {
+        card.querySelector(".reminder-cancel")?.addEventListener("click", event => {
           event.stopPropagation();
           cancelRouteReminder(card);
+        });
+
+        card.querySelector(".pin-action")?.addEventListener("click", event => {
+          event.stopPropagation();
+          toggleRoutePin(card);
         });
       });
 
@@ -1522,6 +1903,9 @@
         syncReminderCard(routeId);
         closeCardActions(card);
 
+        // Wake lock starts only after the user has successfully enabled a reminder.
+        await syncWakeLockWithReminders();
+
         const remainingSeconds = secondsUntil(next.date, now);
         if (remainingSeconds <= thresholdMinutes * 60) {
           showToast(`${route.line} is already within ${thresholdMinutes} minutes. Alarm is triggering now.`);
@@ -1541,13 +1925,15 @@
       }
     }
 
-    function cancelRouteReminder(card) {
+    async function cancelRouteReminder(card) {
       const routeId = card.dataset.routeId;
       const reminder = remindersByRoute.get(routeId);
       remindersByRoute.delete(routeId);
+      activeAlarmRouteIds.delete(routeId);
       saveReminders();
       syncReminderCard(routeId);
       closeCardActions(card);
+      await syncWakeLockWithReminders();
       showToast(reminder ? `Notification cancelled for ${reminder.line}.` : "Notification cancelled.");
     }
 
@@ -1559,6 +1945,7 @@
       const message = `Departs at ${formatDeparture(departure, now)}.`;
 
       // The banner is the guaranteed delivery method while this HTML page is open.
+      activeAlarmRouteIds.add(reminder.routeId);
       showAlarmBanner(title, message);
       showToast(`🔔 ${title}`);
       await playAlarmSound();
@@ -1601,6 +1988,7 @@
 
           if (!Number.isFinite(departure.getTime()) || departure <= now) {
             remindersByRoute.delete(routeId);
+            activeAlarmRouteIds.delete(routeId);
             syncReminderCard(routeId);
             changed = true;
             continue;
@@ -1619,6 +2007,7 @@
         }
       } finally {
         if (changed) saveReminders();
+        await syncWakeLockWithReminders();
         reminderCheckInProgress = false;
       }
     }
@@ -1634,7 +2023,8 @@
             id="card-${id}"
             data-route-id="${id}"
             data-route-index="${index}"
-            title="Swipe left to set a notification for ${escapeHtml(route.line)}"
+            data-route-name="${escapeHtml(route.line)}"
+            title="Swipe right for notification options or left to pin ${escapeHtml(route.line)}"
           >
             <div class="notification-actions" aria-label="${escapeHtml(route.line)} notification controls">
               <div class="reminder-options">
@@ -1652,8 +2042,16 @@
                 Cancel notification
               </button>
             </div>
-            <div class="card-content" tabindex="0" role="group" aria-label="${escapeHtml(route.line)}. Swipe left for notification options">
-              <h3 class="route-name">${escapeHtml(route.line)}</h3>
+            <div class="pin-actions" aria-label="${escapeHtml(route.line)} pin controls">
+              <button type="button" class="pin-action" aria-label="Pin ${escapeHtml(route.line)}">
+                <span>📌</span><span>PIN</span>
+              </button>
+            </div>
+            <div class="card-content" tabindex="0" role="group" aria-label="${escapeHtml(route.line)}. Swipe right for notification options or left for pin options">
+              <div class="route-title-wrap">
+                <span class="pin-indicator" aria-hidden="true">📌</span>
+                <h3 class="route-name">${escapeHtml(route.line)}</h3>
+              </div>
               <div class="compact-departure next-departure">
                 <span class="compact-label">Next</span>
                 <time class="compact-time next-time">Checking…</time>
@@ -1663,6 +2061,10 @@
               <div class="compact-departure following-departure">
                 <span class="compact-label">Then</span>
                 <time class="compact-time following-time">Checking…</time>
+              </div>
+              <div class="pinned-reminder-countdown" aria-live="polite">
+                <span class="reminder-countdown-label">Alarm in</span>
+                <strong class="reminder-countdown-value"></strong>
               </div>
             </div>
           </article>
@@ -1743,6 +2145,7 @@
           card.querySelector(".next-time").textContent = "No service found";
           card.querySelector(".next-countdown").textContent = "—";
           card.querySelector(".following-time").textContent = "—";
+          updatePinnedReminderCountdown(card, now);
           return;
         }
 
@@ -1768,6 +2171,8 @@
           followingTime.removeAttribute("datetime");
 
         }
+
+        updatePinnedReminderCountdown(card, now);
 
       });
     }
@@ -1850,6 +2255,7 @@
 
     function init() {
       loadReminders();
+      loadPinnedRoutes();
       renderDashboard();
       renderTable();
       initScheduleToggles();
@@ -1857,6 +2263,7 @@
       initAlarmBanner();
       initSwipeActions();
       syncAllReminderCards();
+      syncAllPinCards();
 
       const now = new Date();
       checkReminders(now);
@@ -1875,10 +2282,16 @@
         }
       }, 1000);
 
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) checkReminders(new Date());
+      document.addEventListener("visibilitychange", async () => {
+        if (!document.hidden) {
+          await syncWakeLockWithReminders();
+          checkReminders(new Date());
+        }
       });
-      window.addEventListener("focus", () => checkReminders(new Date()));
+      window.addEventListener("focus", async () => {
+        await syncWakeLockWithReminders();
+        checkReminders(new Date());
+      });
     }
 
     document.addEventListener("DOMContentLoaded", init);
