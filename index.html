@@ -1,227 +1,665 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Under Construction!</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<!-- <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@100&display=swap" rel="stylesheet">  -->
-	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tagalog&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-	<link rel="icon" href="assets/media/favicon.svg">
-	<link rel="mask-icon" href="assets/media/favicon.svg" color="#000000">
-	<link rel="apple-touch-icon" href="assets/media/m.png">
-	<style>
-		:root{
-			--primary:#002200;
-			--secondary:#FFFFFF;
-			--accent:#008800;
-			--green:#28B80F; /* Greenest Green */
-			color-scheme: dark;
-		}
-		h1{
-			font-size: 4rem;
-		}
-		h1 {
-			font-family: 'Lexend','Noto Sans Tagalog', sans-serif;
-			font-weight: 200;
-			color: #fff;
-			text-decoration: none;
-			text-align: center;
-			/* text-shadow: 2px 2px 4px #aaa; */
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			-ms-user-select: none;
-			user-select: none;
-		}
+    <title>Morgan | Systems Analyst</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Portfolio of Mark Morgan Miranda - Systems Analyst and Fullstack Developer">
+    
+    <!-- W3CSS (Preserved as requested base) -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-		html, body {
-			margin: 0px;
-			background-color: var(--primary);
-			color: var(--secondary);
-			/*background: -webkit-radial-gradient(#00d2ff, #3a7bd5);  Chrome 10-25, Safari 5.1-6 */
-			/*background: radial-gradient(#00d2ff, #3a7bd5);  W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-		}
-	canvas {
-				display: block;
-		}
-	</style>
+    <style>
+        :root {
+            --primary: #04AA6D;
+            --accent: #00ff41; /* Hacker Green */
+            --bg-dark: #111111;
+            --bg-light: #f4f4f4;
+            --text-dark: #fff;
+            --text-light: #222;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
 
-	<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js" type="text/javascript"></script> -->
+        body, h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; }
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.5s, color 0.5s;
+            overflow-x: hidden;
+        }
 
+        /* --- Canvas Background --- */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1; /* Subtle in light mode */
+            transition: opacity 0.5s;
+        }
+
+        /* --- Dark Mode Styles --- */
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        body.dark-mode #matrix-canvas {
+            opacity: 0.8; /* Visible in dark mode */
+        }
+        body.dark-mode .w3-sidebar {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--glass-border);
+        }
+        body.dark-mode .code-window {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,255,65, 0.1);
+        }
+
+        /* --- Custom Cursor --- */
+        .cursor-dot,
+        .cursor-dot-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+        }
+        .cursor-dot-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--primary);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        /* Hover effect for cursor */
+        body:hover .cursor-dot-outline { opacity: 1; }
+        a:hover ~ .cursor-dot-outline, button:hover ~ .cursor-dot-outline {
+            background-color: rgba(4, 170, 109, 0.2);
+            width: 60px;
+            height: 60px;
+        }
+
+        /* --- Navigation & Sidebar --- */
+        nav.w3-sidebar {
+            z-index: 3;
+            width: 40%;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        /* Mobile Overlay Nav */
+        #mySidebar {
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px);
+        }
+        
+        /* --- Hero Section --- */
+        .hero-title {
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(to right, #fff, #04AA6D);
+            -webkit-background-clip: text;
+            /* color: transparent; handled in JS for compatibility */ 
+        }
+        body:not(.dark-mode) .hero-title {
+            background: linear-gradient(to right, #000, #04AA6D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .typewriter span {
+            border-right: 3px solid var(--primary);
+            animation: blink 0.75s step-end infinite;
+        }
+        @keyframes blink { 50% { border-color: transparent; } }
+
+        /* --- Portfolio Grid --- */
+        .portfolio-img-wrapper {
+            overflow: hidden;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+        }
+        .portfolio-img-wrapper img {
+            transition: transform 0.5s ease;
+            width: 100%;
+            display: block;
+        }
+        .portfolio-img-wrapper:hover img {
+            transform: scale(1.1);
+        }
+        .portfolio-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .portfolio-img-wrapper:hover .portfolio-overlay { opacity: 1; }
+
+        /* --- Code Window (Skills) --- */
+        .code-window {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 0;
+            overflow: hidden;
+            text-align: left;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .code-window:hover { transform: translateY(-5px); }
+        .window-header {
+            background: rgba(0,0,0,0.1);
+            padding: 8px 15px;
+            display: flex;
+            gap: 6px;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .window-body { padding: 15px; overflow-x: auto; }
+        
+        /* Syntax highlighting classes */
+        .kwd { color: #d55fde; font-weight: bold; } /* keyword */
+        .str { color: #89ca78; } /* string */
+        .op { color: #61afef; } /* operator */
+        .var { color: #e5c07b; } /* variable */
+
+        /* --- Stat Counters --- */
+        .stat-box {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .stat-box:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(4, 170, 109, 0.3);
+        }
+        .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--primary); }
+
+        /* --- Scroll Reveal Animation --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Buttons --- */
+        .btn-modern {
+            background-size: 300% 100%;
+            background-image: linear-gradient(to right, #04AA6D, #008800, #30dd8a, #04AA6D);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.4s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(4, 170, 109, 0.4);
+        }
+        .btn-modern:hover {
+            background-position: 100% 0;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(4, 170, 109, 0.6);
+            color: #fff;
+        }
+
+        /* --- Dark Mode Toggle --- */
+        .toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: var(--bg-dark);
+            color: #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .toggle-btn:hover { transform: rotate(180deg); }
+        body:not(.dark-mode) .toggle-btn { background: #fff; color: #000; }
+
+        /* --- Social Icons --- */
+        .social-link {
+            display: inline-block;
+            margin: 0 10px;
+            font-size: 1.5rem;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .social-link:hover {
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        /* --- Utilities --- */
+        .w3-main { margin-left: 40%; transition: margin-left 0.5s; }
+        @media (max-width: 992px) {
+            .w3-sidebar { width: 100%; height: 60px; display: none; }
+            .w3-main { margin-left: 0; }
+        }
+    </style>
 </head>
-<body>
-	<main class="container d-block my-auto position-absolute top-50 start-50 translate-middle">
-		<h1>ᜀᜅ᜔ ᜉᜑᜒᜈᜇ᜔ᜌᜅ᜔ ᜁᜆᜓ ᜀᜌ᜔ ᜃᜐᜎᜓᜃᜓᜌᜅ᜔ ᜊᜒᜈᜓᜊᜓᜂ</h1>
-			<details>
-				<summary>Translation</summary>
-				<p>Ang pahinaryang ito ay kasalukuyang binubuo</p>
-				<p>This webpage is under construction</p>
-				<a href="https://zaqxen.w3spaces.com" target="_blank" rel="nofollow"  referrerpolicy="no-referrer">zaqxen.w3spaces.com</a><br>
-				<small>
-					<a title="Reference" href="https://en.wikipedia.org/wiki/Baybayin#Characters" rel="noopener" target="_blank" referrerpolicy="origin" hreflang="tl">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-wikipedia" viewBox="0 0 16 16">
-						<path d="M8.835 3.003c.828-.006 2.688 0 2.688 0l.033.03v.288c0 .08-.045.12-.133.12-.433.02-.522.063-.68.29-.087.126-.258.393-.435.694l-1.52 2.843-.043.089 1.858 3.801.113.031 2.926-6.946c.102-.28.086-.478-.044-.595-.132-.114-.224-.18-.563-.195l-.275-.014a.161.161 0 0 1-.096-.035.1.1 0 0 1-.046-.084v-.289l.042-.03h3.306l.034.03v.29c0 .078-.045.117-.133.117-.433.02-.754.113-.962.281a1.64 1.64 0 0 0-.488.704s-2.691 6.16-3.612 8.208c-.353.672-.7.61-1.004-.019A224.05 224.05 0 0 1 8.044 8.81c-.623 1.285-1.475 3.026-1.898 3.81-.411.715-.75.622-1.02.019-.45-1.065-1.131-2.519-1.817-3.982-.735-1.569-1.475-3.149-1.943-4.272-.167-.4-.293-.657-.412-.759-.12-.1-.368-.16-.746-.18C.069 3.429 0 3.395 0 3.341v-.303l.034-.03c.615-.003 3.594 0 3.594 0l.034.03v.288c0 .08-.05.118-.15.118l-.375.016c-.322.013-.483.11-.483.288 0 .083.034.217.109.4.72 1.753 3.207 6.998 3.207 6.998l.091.023 1.603-3.197-.32-.71L6.24 5.095s-.213-.433-.286-.577l-.098-.196c-.387-.77-.411-.82-.865-.88-.137-.017-.208-.035-.208-.102v-.304l.041-.03h2.853l.075.024v.303c0 .069-.05.104-.15.104l-.206.03c-.523.04-.438.254-.09.946l1.057 2.163 1.17-2.332c.195-.427.155-.534.074-.633-.046-.055-.202-.144-.54-.158l-.133-.015a.159.159 0 0 1-.096-.034.099.099 0 0 1-.045-.085v-.288l.041-.03Z"/>
-					 </svg>: Baybayin Reference</a>
-				</small>
-			</details>
-	</main>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js" type="text/javascript"></script>
-	<script>
-		document.addEventListener("DOMContentLoaded", function(){
-		// Handler when the DOM is fully loaded
+<body class="dark-mode">
 
-				var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-				window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+    <!-- Background Canvas for Matrix Effect -->
+    <canvas id="matrix-canvas"></canvas>
 
-				var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-dot-outline"></div>
 
-				var rAF;
+    <!-- Sidebar (Desktop) -->
+    <nav class="w3-sidebar w3-hide-medium w3-hide-small">
+        <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+            <!-- Placeholder for a Profile Image or Logo -->
+            <div style="width:150px; height:150px; border-radius:50%; background: #222; margin-bottom:20px; overflow:hidden; border: 3px solid var(--primary); display:flex; align-items:center; justify-content:center;">
+                 <i class="fa-solid fa-user-astronaut" style="font-size: 60px; color: var(--primary);"></i>
+            </div>
+            <h2 style="font-weight:800; color:var(--text-dark);">MORGAN</h2>
+            <p style="opacity:0.7;">Systems Analyst</p>
+        </div>
+    </nav>
 
+    <!-- Mobile Menu Button -->
+    <a class="w3-top w3-hide-large w3-padding-16 w3-margin-right" style="right:0; position:fixed; z-index:99; color:var(--primary);" onclick="openNav()">
+        <i class="fa-solid fa-bars fa-2x"></i>
+    </a>
 
-				var canvas = document.getElementById("canvas"),
-					context = canvas.getContext("2d"),
-					width = canvas.width = window.innerWidth,
-					height = canvas.height = window.innerHeight,
-					particles = [],
-					mouseX = 0,
-					mouseY = 0,
-					total = 15,
-					followSpeed = 0.1,
-					size = 25;
+    <!-- Overlay Mobile Menu -->
+    <nav id="mySidebar" class="w3-sidebar w3-animate-right" style="display:none; padding-top:100px; right:0; top:0; height:100%; width:100%; z-index:100; position:fixed;">
+        <a href="javascript:void(0)" onclick="closeNav()" class="w3-display-topright w3-padding-large w3-xxlarge w3-text-white">
+            <i class="fa-solid fa-xmark"></i>
+        </a>
+        <div class="w3-bar-block w3-center w3-xlarge w3-text-white">
+            <a href="#home" onclick="closeNav()" class="w3-bar-item w3-button w3-hover-text-green">Home</a>
+            <a href="#portfolio" onclick="closeNav()" class="w3-bar-item w3-button w3-hover-text-green">Portfolio</a>
+            <a href="#about" onclick="closeNav()" class="w3-bar-item w3-button w3-hover-text-green">About</a>
+            <a href="#contact" onclick="closeNav()" class="w3-bar-item w3-button w3-hover-text-green">Contact</a>
+        </div>
+    </nav>
 
-				document.body.addEventListener("mousemove", function (event) {
-					mouseX = event.clientX;
-					mouseY = event.clientY;
-				});
+    <!-- Page Content -->
+    <div class="w3-main w3-padding-large" id="main-content">
+        
+        <!-- Dark Mode Toggle -->
+        <div class="toggle-btn" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </div>
 
-				window.addEventListener('resize', function () {
-					width = canvas.width = window.innerWidth;
-					height = canvas.height = window.innerHeight;
-				});
+        <!-- Header / Hero -->
+        <header class="w3-container w3-center reveal active" style="padding:100px 16px; min-height:80vh; display:flex; flex-direction:column; justify-content:center; align-items:center;" id="home">
+            <h1 class="w3-jumbo hero-title"><b>Morgan</b></h1>
+            <h3 class="typewriter" style="font-family: 'JetBrains Mono', monospace; min-height: 1.5em; color: var(--primary);">
+                <span id="typing-text"></span>
+            </h3>
+            <br>
+            <button class="btn-modern" onclick="window.open('https://drive.google.com/file/d/1zho1A8jg1XvWSZwVSwZ1dwzgMXC06eOP/view?usp=drive_link')">
+                <i class="fa-solid fa-download"></i> Download Resume
+            </button>
+        </header>
 
-				function init() {
-					cancelAnimationFrame(rAF);
+        <!-- Portfolio Section -->
+        <div class="w3-padding-32 w3-content reveal" id="portfolio">
+            <h2 class="w3-text-grey"><b>My Portfolio</b></h2>
+            <hr style="width:100px; border:3px solid var(--primary)" class="w3-round">
 
-					particles = [];
+            <!-- Masonry Grid CSS Columns for better layout -->
+            <div style="column-count: 2; column-gap: 16px;">
+                <!-- Image 1 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaXejmLRZjVotKwoW8RuxCyfILzYYZjmny2_TB5gmurv8kmnOqJKQptOkyEF8J3nyz8-eA1ev_HYSJ5_Cbap1A5a3Wqv9oeByE7y0vZzWjfGVgaota1-j2CfHwoU4ZBorVDVxzmH-MFi1-J-YgiVDotD0Q=w1376-h1032-s-no?authuser=0">
+                    <div class="portfolio-overlay">
+                        <span class="w3-text-white w3-large"><i class="fa-solid fa-eye"></i> View</span>
+                    </div>
+                </div>
+                <!-- Image 2 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaWgghY_0IuiZFOqyfeHQc-0r3gmpCyaeNI8QT_QuqqOYWRLMlpAJ_0Y8DGN3FlmuQeQS3uX9r0UDe9mpeLybVhaUtYvVt5tdZvXJFQQxrhcR_2u9Qpj5vR1VUK7hF5W2p8yHvP1eTO_uj1txsYtgJeapw=w589-h1047-s-no?authuser=0">
+                </div>
+                <!-- Image 3 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaVJdvUb82HdV05vWtFZFEqHKXjfR8xaFyHRmn4g7DcR6jvsZejeBfpHpFPB4TSeg2LJdKTS6GnD5H4QBWQflI3GYNs5bfIu752iakk7xHtrGM_abAbmv7xdP9oaOjoCQqsNLTJfXPEGTwiYlLSf-3QosA=w1675-h1047-s-no?authuser=0">
+                </div>
+                <!-- Image 4 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaXohkBTwwXTb0nYcXtFQxi2t8CX7sheKMweOUBfWBhzsjBvKR6Za6VYklzZoBEiHPDDpzTUdP_iQhznQfXiOlUpO4TD_xt_WlZkhoFDGMEeBo4SHBiKYjsFP7g4qblXy5UdoXa5FdkXwPB_ITU47aSdTQ=w774-h1032-s-no?authuser=0">
+                </div>
+                <!-- Image 5 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaWrGAcWrjA4Cj8V_ZsBT8ga_s3aDHnWWHT0N0L6DipXJwPGdS9W5vSosE5kTMGe9mCveJAkCKL8nqar_4PQPVxUQrBg6YxzGj0Cg12F8EIf9A_k7x5sZadShfDG58RRSbe5gxcSEv_c70GUFKswxyPurQ=w1675-h1047-s-no?authuser=0">
+                </div>
+                <!-- Image 6 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaXm6g2DZrJrw7Cp5geBXlRPhzG_AlPjlMJrMLZ9X95TZSyqjHirqqWqT22rQQdGeGTerPp6iHmg0XQjdfeR4spxxEm7eb3b6lqkJ3T7_dmf-0OHoeceyWom3DhLplTk2v0PCTCkQsbokmPzgXkZ7DwGUA=w1675-h1047-s-no?authuser=0">
+                </div>
+                <!-- Image 7 -->
+                <div class="portfolio-img-wrapper" style="break-inside: avoid;">
+                    <img src="https://lh3.googleusercontent.com/pw/AJFCJaVEgyXkJkJbMY_HMjeIiDruz3lnGRHEKNvbRG-Ak5MHSGcTdxjrWNsMhc7184I9QHxhC3MSt18fWqKnO5bYAmQ0pfzbzVZn3YUAIjLJb-y_7PWZCadu8N1zYlhIKulW9mM9anVaWrjkvSbxFYeqDD2o3A=w1835-h1032-s-no?authuser=0">
+                </div>
+            </div>
 
-					for (var i = 0; i < total; i += 1) {
-						particles.push(new Particle(i));
-					}
+            <div class="w3-center w3-padding-32">
+                <a class="btn-modern" href="https://photos.google.com/share/AF1QipMz2edLjAopIXx9YMrWvsHLissswPr7hPIyEgMNhgWSc-aqQHBvck9F546G4QHVbg?key=aEg4aFNHanFfU3hTYkp1al9RN1RWeHBKWDZSQnVR" target="_blank">
+                    View More Photos
+                </a>
+            </div>
+        </div>
 
-					draw();
-				}
+        <!-- About Section -->
+        <div class="w3-content w3-padding-32 reveal" id="about">
+            <h2 class="w3-text-grey"><b>About Me</b></h2>
+            <hr style="width:100px; border:3px solid var(--primary)" class="w3-round">
+            
+            <p class="w3-large">I am a 🇵🇭 systems analyst and full-stack developer with a passion for leveraging analytical skills and technical expertise to design, develop, and optimize software applications and systems. From gathering requirements to deployment, I play an active role throughout the software development life cycle, analyzing business needs and delivering innovative, scalable solutions.</p>
+            
+            <!-- VS Code Style Skills Window -->
+            <h3 class="w3-padding-16">My Skills</h3>
+            <div class="code-window">
+                <div class="window-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                    <span style="margin-left:10px; opacity:0.6; font-size:0.8em; font-family:sans-serif;">skills.js</span>
+                </div>
+                <div class="window-body">
+                    <pre><code><span class="kwd">if</span>(language == <span class="str">"java"</span> || language == <span class="str">"C#"</span> || language == <span class="str">"C++"</span> ||
+   framework === <span class="str">"ReactJS"</span> || framework === <span class="str">"ReactNative"</span>){
+   <span class="var">knowledge</span> = <span class="kwd">true</span>;
+}
 
-				function draw() {
-					context.clearRect(0, 0, width, height);
+<span class="kwd">if</span>($language == <span class="str">"PHP"</span>){
+   <span class="var">$knowledge</span> = <span class="kwd">true</span>;
+}
 
-					for (var i = 0; i < total; i += 1) {
-						particles[i].update();
-					}
+<span class="kwd">if</span> language == <span class="str">"Python"</span> <span class="kwd">or</span> framework == <span class="str">"Django"</span>:
+   <span class="var">knowledge</span> = <span class="kwd">True</span>
 
-					rAF = requestAnimationFrame(draw);
-				}
+<span class="kwd">If</span> (language = <span class="str">"VB"</span>) <span class="kwd">Then</span>
+   <span class="var">knowledge</span> = <span class="kwd">True</span>
+<span class="kwd">End If</span>
 
+<span class="kwd">IF</span> (@dbengine = <span class="str">'MSSQL'</span> <span class="kwd">OR</span> @language = <span class="str">'SQL'</span>)
+  <span class="kwd">BEGIN</span>
+     <span class="kwd">Set</span> <span class="var">knowledge</span> = 1
+  <span class="kwd">END</span>
 
-				/**
-				 * Particle
-				 */
-				var Particle, p;
+<span class="kwd">IF</span> (dbengine = <span class="str">'MYSQL'</span>) <span class="kwd">THEN</span>
+   <span class="kwd">Set</span> <span class="var">knowledge</span> = 1;
+<span class="kwd">END IF</span>;</code></pre>
+                </div>
+            </div>
 
-				Particle = function (index) {
-					this.initialize(index);
-				};
+            <!-- Animated Stats -->
+            <div class="w3-row-padding w3-center w3-section" id="stats-section">
+                <div class="w3-quarter w3-margin-bottom">
+                    <div class="stat-box">
+                        <span class="stat-number" data-target="8">0</span><span class="w3-xlarge text-accent">+</span><br>
+                        Coding Languages
+                    </div>
+                </div>
+                <div class="w3-quarter w3-margin-bottom">
+                    <div class="stat-box">
+                        <span class="stat-number" data-target="52">0</span><span class="w3-xlarge text-accent">+</span><br>
+                        Projects Done
+                    </div>
+                </div>
+                <div class="w3-quarter w3-margin-bottom">
+                    <div class="stat-box">
+                        <span class="stat-number" data-target="17">0</span><span class="w3-xlarge text-accent">+</span><br>
+                        Years Experience
+                    </div>
+                </div>
+                <div class="w3-quarter w3-margin-bottom">
+                    <div class="stat-box">
+                        <span class="stat-number" data-target="99">0</span><span class="w3-xlarge text-accent">%</span><br>
+                        Certified Developer
+                    </div>
+                </div>
+            </div>
+        </div>
 
-				p = Particle.prototype;
+        <!-- Contact Section -->
+        <div class="w3-padding-32 w3-content reveal" id="contact" style="margin-bottom:64px">
+            <h2 class="w3-text-grey"><b>Contact Me</b></h2>
+            <hr style="width:100px; border:3px solid var(--primary)" class="w3-round">
 
-				p.initialize = function (index) {
-					this.x = -50;
-					this.y = height;
-					this.id = index + 1;
-					this.angleX = Math.PI * 2 * Math.random();
-					this.angleY = Math.PI * 2 * Math.random();
-					this.speedX = .03 * Math.random() + .03;
-					this.speedY = .03 * Math.random() + .03;
-					this.radius = 150;
+            <div class="w3-section">
+                <p><i class="fa-solid fa-location-dot w3-xxlarge w3-margin-right w3-text-green"></i> Ajman, UAE</p>
+                <p><i class="fa-solid fa-phone w3-xxlarge w3-margin-right w3-text-green"></i> Phone: +00 ------</p>
+                <p><i class="fa-solid fa-envelope w3-xxlarge w3-margin-right w3-text-green"></i> Email: mail@email.com</p>
+            </div>
+            
+            <img src="https://lh3.googleusercontent.com/pw/AJFCJaWNQpRdUt2GiS8pDqSa55MCb_sSoOTkNjxiqsxEJ2Dhu7seu3tLI1s6exXM3fZY4TbmorkiE3Mojpdk7df6EmgBF_sm03wdE4gsUZOYb_qx2P7ZFm0AzvDPo7KtwtLFt7UvUTaY_0T1KLPv8IOdqAfhBg=w1396-h1047-s-no?authuser=0" class="w3-image w3-greyscale w3-round" style="width:100%; margin:32px 0; border:1px solid #333;">
+        </div>
 
-					return this;
-				};
+        <!-- Footer -->
+        <footer class="w3-container w3-padding-64 w3-center w3-xlarge" style="margin:-24px; border-top: 1px solid var(--glass-border);">
+            <div class="social-media">
+                <a href="https://jsfiddle.net/user/zaqxen" target="_blank" class="social-link" title="JSFiddle"><i class="fa-brands fa-jsfiddle"></i></a>
+                <a href="https://www.reddit.com/user/Mountain_Coach4386/" target="_blank" class="social-link" title="Reddit"><i class="fa-brands fa-reddit"></i></a>
+                <a href="https://stackoverflow.com/users/8348934/mark-morgan-miranda" target="_blank" class="social-link" title="Stack Overflow"><i class="fa-brands fa-stack-overflow"></i></a>
+                <a href="https://github.com/zaqxen" target="_blank" class="social-link" title="Github"><i class="fa-brands fa-github"></i></a>
+                <a href="javascript:void(0)" class="social-link" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <a href="javascript:void(0)" class="social-link" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="javascript:void(0)" class="social-link" title="X"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://www.linkedin.com/in/markmorganmiranda/" target="_blank" class="social-link" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+            <p class="w3-small w3-padding-16">
+                <script>document.write(new Date().getFullYear())</script> Morgan. No rights reserved.
+            </p>
+        </footer>
+    </div>
 
-				p.update = function () {
-					var aim, dx, dy, scale, angle;
+    <!-- Scripts -->
+    <script>
+        // --- 1. Navigation Logic ---
+        function openNav() {
+            document.getElementById("mySidebar").style.display = "block";
+        }
+        function closeNav() {
+            document.getElementById("mySidebar").style.display = "none";
+        }
 
-					if (this.id > 1) {
-						aim = particles[this.id - 1 - 1];
-						dx = aim.x - this.x;
-						dy = aim.y - this.y;
+        // --- 2. Dark Mode Toggle ---
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle("dark-mode");
+            const icon = document.getElementById("theme-icon");
+            if (body.classList.contains("dark-mode")) {
+                icon.classList.remove("fa-sun");
+                icon.classList.add("fa-moon");
+            } else {
+                icon.classList.remove("fa-moon");
+                icon.classList.add("fa-sun");
+            }
+        }
 
-						this.x += dx * con.speed;
-						this.y += dy * con.speed;
-					} else {
-						if (mouseX === 0 && mouseY === 0) {
-								dx = width / 2 + Math.cos(this.angleX) * this.radius - this.x;
-								dy = height / 2 + Math.sin(this.angleY) * this.radius - this.y;
+        // --- 3. Matrix Rain Effect (Canvas) ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
 
-								this.x = width / 2 + Math.cos(this.angleX) * this.radius;
-								this.y = height / 2 + Math.sin(this.angleY) * this.radius;
+        // Set canvas to full screen
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-								this.angleX += this.speedX;
-								this.angleY += this.speedY;
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const alphabet = katakana + latin + nums;
 
-						} else {
-								dx = mouseX - this.x;
-								dy = mouseY - this.y;
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
 
-								this.x += dx * con.speed;
-								this.y += dy * con.speed;
-						}
-					}
+        // Initialize drops
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
 
-					angle = Math.atan2(dy, dx);
-					scale = Math.cos(Math.PI / 2 * (this.id / total));
+        function drawMatrix() {
+            // Semi-transparent black to create fade effect
+            const isDark = document.body.classList.contains('dark-mode');
+            ctx.fillStyle = isDark ? 'rgba(0, 0, 0, 0.05)' : 'rgba(240, 240, 240, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-					context.save();
-					context.translate(this.x, this.y);
-					context.rotate(angle);
-					context.scale(scale, scale);
+            ctx.fillStyle = isDark ? '#0F0' : '#04AA6D'; // Hacker Green
+            ctx.font = fontSize + 'px monospace';
 
-					context.beginPath();
-					context.moveTo(-size / 2 * 1.732, -size / 2);
-					context.lineTo(0, 0);
-					context.lineTo(-size / 2 * 1.732, size / 2);
-					context.lineTo(-size / 2 * 1.2, 0);
-					context.fillStyle = '#229242';
-					context.fill();
+            for (let i = 0; i < drops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-					context.restore();
-				};
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 30);
 
-				// control bar
-				var ControlBar = function () {
-					this.num = total;
-					this.speed = followSpeed;
-				};
+        // --- 4. Custom Cursor Follower ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-dot-outline');
 
-				var con = new ControlBar();
-				var gui = new dat.GUI();
-				var conSpeed = gui.add(con, 'speed', 0.05, 0.25).step(0.05);
-				var conNum = gui.add(con, 'num', 10, 30).step(1);
+        window.addEventListener('mousemove', function(e) {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+            
+            // Add slight lag to outline for fluid feel
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
 
-				conNum.onFinishChange(function (value) {
-					total = value;
+        // --- 5. Typewriter Effect ---
+        const textElement = document.getElementById("typing-text");
+        const words = ["Systems Analyst", "Fullstack Developer", "Code Enthusiast"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
 
-					init();
-				});
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                textElement.innerText = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                textElement.innerText = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
 
-				init();
-		});
-	</script>
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                setTimeout(type, 2000); // Pause at end
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                setTimeout(type, 500); // Pause before new word
+            } else {
+                setTimeout(type, isDeleting ? 50 : 100);
+            }
+        }
+        type();
 
-	<canvas id="canvas"></canvas>
+        // --- 6. Scroll Reveal & Number Counter ---
+        const reveals = document.querySelectorAll('.reveal');
+        const statsSection = document.getElementById('stats-section');
+        let statsAnimated = false;
 
-	<!--     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script> -->
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
 
+            // Reveal elements
+            reveals.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add("active");
+                }
+            });
+
+            // Trigger Stat Counter
+            const statsTop = statsSection.getBoundingClientRect().top;
+            if (statsTop < windowHeight - 50 && !statsAnimated) {
+                animateStats();
+                statsAnimated = true;
+            }
+        };
+
+        function animateStats() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const speed = 200; // Lower is slower
+                
+                const updateCount = () => {
+                    const count = +counter.innerText;
+                    const inc = target / speed;
+                    
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + inc);
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            });
+        }
+
+        window.addEventListener("scroll", revealOnScroll);
+        // Trigger once on load
+        revealOnScroll();
+
+    </script>
 </body>
 </html>
