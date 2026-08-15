@@ -46,6 +46,8 @@
             --effect-glow: rgba(0, 122, 77, 0.48);
             --kinetic-line: rgba(0, 122, 77, 0.44);
             --kinetic-dash: rgba(0, 122, 77, 0.58);
+            --dialog-reveal-line: rgba(0, 77, 49, 0.92);
+            --dialog-reveal-glow: rgba(0, 122, 77, 0.45);
             --pointer-x: 72vw;
             --pointer-y: 18vh;
             --content-max: 1040px;
@@ -75,6 +77,8 @@
             --effect-glow: rgba(34, 228, 154, 0.65);
             --kinetic-line: rgba(34, 228, 154, 0.28);
             --kinetic-dash: rgba(34, 228, 154, 0.38);
+            --dialog-reveal-line: rgba(184, 255, 219, 0.96);
+            --dialog-reveal-glow: rgba(34, 228, 154, 0.72);
             color-scheme: dark;
         }
 
@@ -504,7 +508,7 @@
                 var(--primary-bright) 74%,
                 transparent 88% 100%
             );
-            animation: orbit-spin 14s linear infinite;
+            animation: orbit-spin 3.2s linear infinite;
         }
 
         .avatar-orbit::after {
@@ -620,11 +624,15 @@
 
         .rail-nav a,
         .mobile-nav a {
+            position: relative;
+            overflow: hidden;
             text-decoration: none;
-            border: 1px solid transparent;
-            border-radius: 12px;
+            border: 1px solid rgba(4, 170, 109, 0.24);
+            border-radius: 6px;
+            background: linear-gradient(180deg, rgba(4, 170, 109, 0.055), rgba(4, 170, 109, 0.018));
             color: var(--muted);
-            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .rail-nav a {
@@ -632,12 +640,64 @@
         }
 
         .rail-nav a:hover,
-        .rail-nav a[aria-current="true"],
-        .mobile-nav a:hover,
-        .mobile-nav a[aria-current="true"] {
+        .mobile-nav a:hover {
             color: var(--text);
-            border-color: var(--border);
-            background: rgba(4, 170, 109, 0.08);
+            border-color: rgba(4, 170, 109, 0.52);
+            background: rgba(4, 170, 109, 0.09);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px rgba(4, 170, 109, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .rail-nav a[aria-current="true"],
+        .mobile-nav a[aria-current="true"] {
+            isolation: isolate;
+            color: var(--primary-bright);
+            border-color: transparent;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        /* Match the Project History hover treatment: a bright conic-gradient
+           segment continuously travels clockwise around the active nav item. */
+        .rail-nav a[aria-current="true"]::before,
+        .mobile-nav a[aria-current="true"]::before {
+            content: '';
+            position: absolute;
+            z-index: -2;
+            left: 50%;
+            top: 50%;
+            width: 190%;
+            aspect-ratio: 1;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0 73%,
+                rgba(34, 228, 154, 0.12) 78%,
+                var(--primary-bright) 84%,
+                rgba(255, 255, 255, 0.95) 87%,
+                var(--primary-bright) 90%,
+                transparent 96% 100%
+            );
+            transform: translate(-50%, -50%) rotate(0turn);
+            animation: section-link-border-spin 1.05s linear infinite;
+            pointer-events: none;
+        }
+
+        .rail-nav a[aria-current="true"]::after,
+        .mobile-nav a[aria-current="true"]::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            inset: 1px;
+            border-radius: 5px;
+            /* Fully opaque inner plate: the rotating conic gradient can only
+               be seen through the 1px perimeter, never across the button fill. */
+            background: var(--panel-solid);
+            box-shadow: inset 0 0 0 1px rgba(4, 170, 109, 0.045);
+            pointer-events: none;
+        }
+
+        @keyframes section-link-border-spin {
+            to { transform: translate(-50%, -50%) rotate(1turn); }
         }
 
         .site-main {
@@ -698,6 +758,37 @@
             width: min(100%, 420px);
             display: grid;
             gap: 12px;
+        }
+
+        .mobile-profile {
+            display: grid;
+            place-items: center;
+            margin: 0 0 10px;
+        }
+
+        .mobile-avatar-orbit {
+            width: 126px;
+            height: 126px;
+            margin: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-avatar-orbit::after {
+            inset: 6px;
+        }
+
+        .mobile-avatar-orbit .avatar-flip {
+            width: 104px;
+            height: 104px;
+        }
+
+        .mobile-avatar-orbit .avatar-front {
+            font-size: 44px;
+        }
+
+        .avatar-orbit.is-flipped .avatar-flip {
+            transform: rotateY(180deg);
         }
 
         .mobile-nav a {
@@ -2043,6 +2134,576 @@
             font-size: 0.88rem;
         }
 
+
+        /* Project archive dialog */
+        .stat-box-project {
+            width: 100%;
+            color: inherit;
+            font: inherit;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .stat-box-project .stat-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            color: var(--primary-bright);
+            font-size: 0.68rem;
+            letter-spacing: 0.02em;
+            opacity: 0.78;
+            transition: transform 0.22s ease, opacity 0.22s ease;
+        }
+
+        .stat-box-project:hover .stat-action,
+        .stat-box-project:focus-visible .stat-action {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        .stat-box-project:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 3px;
+        }
+
+        .project-history-dialog {
+            position: relative;
+            width: min(1180px, calc(100vw - 28px));
+            max-width: 1180px;
+            max-height: min(94vh, 940px);
+            padding: 0;
+            overflow: visible;
+            color: var(--text);
+            background: transparent;
+            border: 0;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+
+        /* Opening cue: a theme-aware line appears at the exact center first,
+           grows horizontally, holds for a beat, then disappears as the shell
+           expands vertically from that same line. */
+        .project-history-dialog::before {
+            content: '';
+            position: absolute;
+            z-index: 20;
+            left: 50%;
+            top: 50%;
+            width: 0;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, var(--dialog-reveal-line) 10%, var(--dialog-reveal-line) 90%, transparent);
+            box-shadow: 0 0 10px var(--dialog-reveal-glow), 0 0 24px var(--dialog-reveal-glow);
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .project-history-dialog[open]::before {
+            animation: project-dialog-line-charge 0.72s ease-in-out both;
+        }
+
+        .project-history-dialog::backdrop {
+            background: rgba(2, 9, 6, 0.76);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .project-history-dialog[open]::backdrop {
+            animation: project-backdrop-in 0.34s ease both;
+        }
+
+        .project-history-shell {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: min(94vh, 940px);
+            max-height: min(94vh, 940px);
+            min-height: 0;
+            overflow: hidden;
+            background: var(--panel-solid);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(4, 170, 109, 0.08);
+            opacity: 0;
+            transform: scaleY(0.004);
+            transform-origin: center center;
+        }
+
+        .project-history-shell > .project-history-header,
+        .project-history-shell > .project-history-metrics,
+        .project-history-shell > .project-history-scroll {
+            opacity: 0;
+            transform: translateY(7px);
+        }
+
+        .project-history-dialog[open] .project-history-shell {
+            animation: project-dialog-shell-expand 0.78s cubic-bezier(0.16, 1, 0.3, 1) 0.58s both;
+        }
+
+        .project-history-dialog[open] .project-history-shell > .project-history-header,
+        .project-history-dialog[open] .project-history-shell > .project-history-metrics,
+        .project-history-dialog[open] .project-history-shell > .project-history-scroll {
+            animation: project-dialog-content-in 0.32s ease 1.30s both;
+        }
+
+        .project-history-header {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 18px;
+            align-items: start;
+            padding: 18px 22px 15px;
+            border-bottom: 1px solid var(--border);
+            background:
+                radial-gradient(circle at 92% 8%, rgba(4, 170, 109, 0.18), transparent 27%),
+                linear-gradient(135deg, rgba(4, 170, 109, 0.09), transparent 58%);
+        }
+
+        .project-history-header::after {
+            content: '';
+            position: absolute;
+            right: 72px;
+            bottom: 0;
+            width: 140px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-bright), transparent);
+            animation: archive-header-pulse 2.4s ease-in-out infinite;
+        }
+
+        .project-history-header h2 {
+            margin: 2px 0 5px;
+            font-size: clamp(1.65rem, 3.6vw, 2.8rem);
+            font-weight: 500;
+            line-height: 1.04;
+            letter-spacing: 0.01em;
+        }
+
+        .project-history-intro {
+            max-width: 820px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .project-dialog-close {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            color: var(--text);
+            background: rgba(4, 170, 109, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.24s ease, border-color 0.24s ease, background-color 0.24s ease;
+        }
+
+        .project-dialog-close:hover,
+        .project-dialog-close:focus-visible {
+            transform: rotate(90deg);
+            border-color: rgba(4, 170, 109, 0.62);
+            background: rgba(4, 170, 109, 0.15);
+        }
+
+        .project-dialog-close:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 3px;
+        }
+
+        .project-history-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            border-bottom: 1px solid var(--border);
+            background: rgba(4, 170, 109, 0.035);
+        }
+
+        .project-history-metrics > div {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            gap: 9px;
+            min-width: 0;
+            padding: 10px 22px;
+            border-right: 1px solid var(--border);
+        }
+
+        .project-history-metrics > div::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 20%, rgba(4, 170, 109, 0.12), transparent 72%);
+            transform: translateX(-120%);
+        }
+
+        .project-history-dialog[open] .project-history-metrics > div::before {
+            animation: archive-metric-sweep 2.8s ease-in-out infinite;
+            animation-delay: calc(var(--metric-order, 0) * 0.28s + 0.75s);
+        }
+
+        .project-history-metrics > div:nth-child(1) { --metric-order: 0; }
+        .project-history-metrics > div:nth-child(2) { --metric-order: 1; }
+        .project-history-metrics > div:nth-child(3) { --metric-order: 2; }
+        .project-history-metrics > div:last-child { border-right: 0; }
+
+        .project-history-metrics strong {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 auto;
+            color: var(--primary);
+            font-size: clamp(1.22rem, 2.3vw, 1.75rem);
+            font-weight: 600;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .project-history-metrics span {
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 0.64rem;
+            text-transform: uppercase;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            letter-spacing: 0.08em;
+        }
+
+        .project-history-scroll {
+            --archive-y: 0px;
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding: 13px 16px 20px;
+            scrollbar-color: rgba(4, 170, 109, 0.6) transparent;
+            background-image:
+                radial-gradient(circle at 15% var(--archive-y), rgba(4, 170, 109, 0.08), transparent 18%),
+                linear-gradient(rgba(4, 170, 109, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(4, 170, 109, 0.025) 1px, transparent 1px);
+            background-size: auto, 28px 28px, 28px 28px;
+        }
+
+        .project-history-scroll-progress {
+            position: sticky;
+            top: 0;
+            z-index: 12;
+            height: 3px;
+            margin: -13px -16px 11px;
+            overflow: hidden;
+            background: rgba(4, 170, 109, 0.08);
+            pointer-events: none;
+        }
+
+        .project-history-scroll-progress span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(0);
+            transform-origin: left center;
+            background: linear-gradient(90deg, var(--primary), var(--primary-bright), #b7ffdf);
+            box-shadow: 0 0 12px rgba(4, 170, 109, 0.55);
+            transition: transform 0.08s linear;
+        }
+
+        .project-year-group + .project-year-group { margin-top: 16px; }
+
+        .project-year-heading {
+            position: sticky;
+            top: 5px;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 0 7px;
+            padding: 4px 9px;
+            border: 1px solid rgba(4, 170, 109, 0.16);
+            border-radius: 999px;
+            background: var(--panel-solid);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .project-year-heading strong {
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.79rem;
+            letter-spacing: 0.05em;
+        }
+
+        .project-year-heading span {
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 0.62rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .project-year-items {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            perspective: 1000px;
+        }
+
+        .project-history-item {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 8px;
+            min-height: 98px;
+            padding: 10px 11px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel-solid);
+            opacity: 0;
+            transform: translate3d(0, 34px, 0);
+            transition:
+                opacity var(--project-reveal-duration, 380ms) ease,
+                transform var(--project-reveal-duration, 420ms) cubic-bezier(0.2, 0.72, 0.2, 1);
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .project-history-item.is-visible {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .project-history-item.is-initial {
+            transition: none;
+        }
+
+        /* A rotating conic-gradient lives behind a 1px inset panel. The only
+           hover response is the bright segment travelling clockwise around
+           the card perimeter. */
+        .project-history-item::before {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            left: 50%;
+            top: 50%;
+            width: 185%;
+            aspect-ratio: 1;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0 73%,
+                rgba(34, 228, 154, 0.12) 78%,
+                var(--primary-bright) 84%,
+                rgba(255, 255, 255, 0.95) 87%,
+                var(--primary-bright) 90%,
+                transparent 96% 100%
+            );
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(0turn);
+            pointer-events: none;
+        }
+
+        .project-history-item::after {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            inset: 1px;
+            border-radius: 5px;
+            background: var(--panel-solid);
+            pointer-events: none;
+        }
+
+        .project-history-item:hover::before,
+        .project-history-item:focus-within::before {
+            opacity: 1;
+            animation: archive-border-spin 1.05s linear infinite;
+        }
+
+        .project-history-item > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-history-index {
+            align-self: start;
+            color: var(--primary-bright);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.61rem;
+            line-height: 1.45;
+            opacity: 0.82;
+        }
+
+        .project-history-content { min-width: 0; }
+
+        .project-history-date {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.61rem;
+            line-height: 1.25;
+        }
+
+        .project-history-item h3 {
+            margin: 0;
+            color: var(--text);
+            font-size: 0.82rem;
+            font-weight: 560;
+            line-height: 1.23;
+        }
+
+        .project-history-client {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.68rem;
+            line-height: 1.25;
+        }
+
+        .project-history-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .project-history-tag {
+            padding: 2px 5px;
+            color: var(--primary-bright);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.5rem;
+            line-height: 1.25;
+            letter-spacing: 0.01em;
+            border: 1px solid rgba(4, 170, 109, 0.20);
+            border-radius: 999px;
+            background: rgba(4, 170, 109, 0.055);
+        }
+
+        @keyframes project-dialog-line-charge {
+            0% {
+                width: 0;
+                opacity: 0;
+                filter: brightness(0.9);
+            }
+            16% {
+                width: 12%;
+                opacity: 1;
+                filter: brightness(1.15);
+            }
+            58% {
+                width: 84%;
+                opacity: 1;
+                filter: brightness(1.35);
+            }
+            78% {
+                width: 84%;
+                opacity: 1;
+                filter: brightness(0.95);
+            }
+            100% {
+                width: 90%;
+                opacity: 0;
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes project-dialog-shell-expand {
+            0% {
+                opacity: 0;
+                transform: scaleY(0.004);
+            }
+            12% {
+                opacity: 1;
+                transform: scaleY(0.018);
+            }
+            72% {
+                opacity: 1;
+                transform: scaleY(1.018);
+            }
+            100% {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes project-dialog-content-in {
+            from { opacity: 0; transform: translateY(7px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes project-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes archive-header-pulse {
+            0%, 100% { opacity: 0.35; transform: scaleX(0.55); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+        @keyframes archive-metric-sweep {
+            0%, 58% { transform: translateX(-130%); }
+            78%, 100% { transform: translateX(135%); }
+        }
+        @keyframes archive-border-spin {
+            to { transform: translate(-50%, -50%) rotate(1turn); }
+        }
+
+        @media (max-width: 900px) {
+            .project-year-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 620px) {
+            .project-history-dialog { width: calc(100vw - 14px); max-height: 95vh; border-radius: 8px; }
+            .project-history-shell { height: 95vh; max-height: 95vh; }
+            .project-history-header { padding: 15px 14px 12px; gap: 10px; }
+            .project-history-intro { font-size: 0.76rem; }
+            .project-history-metrics > div { flex-direction: column; gap: 2px; padding: 8px 7px; text-align: center; }
+            .project-history-metrics strong { font-size: 1.08rem; }
+            .project-history-metrics span { font-size: 0.52rem; }
+            .project-history-scroll { padding: 11px 9px 16px; }
+            .project-history-scroll-progress { margin: -11px -9px 9px; }
+            .project-year-items { grid-template-columns: 1fr; }
+            .project-history-item { min-height: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            /* Keep the archive interactive even when reduced motion is enabled.
+               The effect is slightly gentler, but it is not disabled entirely. */
+            .project-history-dialog[open]::before {
+                animation-duration: 0.42s;
+            }
+
+            .project-history-dialog[open] .project-history-shell {
+                animation-duration: 0.46s;
+                animation-delay: 0.34s;
+            }
+
+            .project-history-dialog[open] .project-history-shell > .project-history-header,
+            .project-history-dialog[open] .project-history-shell > .project-history-metrics,
+            .project-history-dialog[open] .project-history-shell > .project-history-scroll {
+                animation-duration: 0.22s;
+                animation-delay: 0.78s;
+            }
+
+            .project-history-header::after,
+            .project-history-dialog[open] .project-history-metrics > div::before {
+                animation-duration: 4.2s;
+            }
+
+            .project-history-item {
+                transition-duration: var(--project-reveal-duration, 280ms);
+            }
+
+            .project-history-item:hover::before,
+            .project-history-item:focus-within::before {
+                animation-duration: 1.45s;
+            }
+        }
+
         /* Live projects */
         .live-project-grid {
             display: grid;
@@ -2234,6 +2895,19 @@
             color: var(--primary);
             border-color: rgba(4, 170, 109, 0.38);
             transform: translateY(-3px);
+        }
+
+        .social-link-brand-image img {
+            display: block;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            transition: transform 0.22s ease;
+        }
+
+        .social-link-brand-image:hover img,
+        .social-link-brand-image:focus-visible img {
+            transform: scale(1.12) rotate(-5deg);
         }
 
         .social-disabled {
@@ -2584,7 +3258,7 @@
             }
 
             .avatar-orbit::before {
-                animation: orbit-spin 28s linear infinite !important;
+                animation: orbit-spin 6.4s linear infinite !important;
                 transform: none;
             }
 
@@ -2633,6 +3307,38 @@
             .live-project-card {
                 border: 1px solid CanvasText;
             }
+        }
+
+
+        /* Tighter 2026 geometry: containers keep a small radius, while true pills
+           and circular controls retain their existing 999px / 50% shapes. */
+        .skip-link,
+        .mobile-nav a,
+        .mobile-menu-button,
+        .hero-meta-item,
+        .panel,
+        .project-card,
+        .baybayin-note,
+        .code-window,
+        .stat-box,
+        .live-project-card,
+        .live-project-icon,
+        .social-disabled {
+            border-radius: 8px;
+        }
+
+        .project-history-dialog {
+            border-radius: 10px;
+        }
+
+        .project-dialog-close,
+        .project-history-item {
+            border-radius: 6px;
+        }
+
+        .rail-nav .section-link,
+        .mobile-nav .section-link {
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -2693,6 +3399,18 @@
 
     <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
         <div class="mobile-nav-list">
+            <div class="mobile-profile">
+                <div class="avatar-orbit mobile-avatar-orbit" id="mobile-avatar-orbit" role="button" tabindex="0" aria-label="Flip Morgan profile photo" aria-pressed="false">
+                    <div class="avatar-flip">
+                        <div class="avatar-face avatar-front" aria-hidden="true">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div class="avatar-face avatar-back">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczOHkBg7RWqcvs1dxJO8MEeHtumdGlq2fAO_YhLIbIXBUZEf4F8sQMMmge-iUHPjAE5KCLh9F5Cfyl55d7DIGX7hGyKQia0RVUdrGyVd87Ho_I_kyyvf0XBE_QmyttlHhdnbgFcO2rQTbD3NVvoPO6AmCA=w484-h484-s-no?authuser=0" alt="Morgan profile photo" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                </div>
+            </div>
             <a class="section-link" href="#home" aria-current="true">Home</a>
             <a class="section-link" href="#portfolio">Portfolio</a>
             <a class="section-link" href="#about">About</a>
@@ -2739,7 +3457,7 @@
                         <span>Systems and software experience</span>
                     </div>
                     <div class="hero-meta-item">
-                        <strong>52+ projects</strong>
+                        <strong><span id="project-count-hero">55</span>+ projects</strong>
                         <span>Delivered across technical roles</span>
                     </div>
                     <div class="hero-meta-item">
@@ -2750,10 +3468,10 @@
                 <div class="tech-marquee" aria-hidden="true">
                     <div class="tech-track">
                         <div class="tech-group">
-                            <span>Systems Analysis</span><span>Java</span><span>C#</span><span>C++</span><span>ReactJS</span><span>React Native</span><span>PHP</span><span>Python</span><span>Django</span><span>VB</span><span>MSSQL</span><span>MySQL</span>
+                            <span>Systems Analysis</span><span>Java</span><span>C#</span><span>C++</span><span>JavaScript</span><span>ReactJS</span><span>React Native</span><span>Express</span><span>PHP</span><span>Python</span><span>Django</span><span>VB</span><span>MSSQL</span><span>MySQL</span><span>MariaDB</span><span>PostgreSQL</span><span>SQLite</span>
                         </div>
                         <div class="tech-group">
-                            <span>Systems Analysis</span><span>Java</span><span>C#</span><span>C++</span><span>ReactJS</span><span>React Native</span><span>PHP</span><span>Python</span><span>Django</span><span>VB</span><span>MSSQL</span><span>MySQL</span>
+                            <span>Systems Analysis</span><span>Java</span><span>C#</span><span>C++</span><span>JavaScript</span><span>ReactJS</span><span>React Native</span><span>Express</span><span>PHP</span><span>Python</span><span>Django</span><span>VB</span><span>MSSQL</span><span>MySQL</span><span>MariaDB</span><span>PostgreSQL</span><span>SQLite</span>
                         </div>
                     </div>
                 </div>
@@ -2814,11 +3532,11 @@
 
                 <div class="about-panel panel glass-surface">
                     <p class="about-copy">
-                        I am a <strong>Filipino systems analyst and full-stack developer</strong> with a passion for using analytical thinking and technical expertise to design, develop, and optimize software applications and systems. From gathering requirements to deployment, I work across the software development life cycle, translating business needs into scalable, practical solutions.
+                        I am a <strong><span role="img" aria-label="Philippines">🇵🇭</span> systems analyst and full-stack developer</strong> with a passion for using analytical thinking and technical expertise to design, develop, and optimize software applications and systems. From gathering requirements to deployment, I work across the software development life cycle, translating business needs into scalable, practical solutions.
                     </p>
 
                     <div class="baybayin-note" aria-label="Baybayin cultural accent">
-                        <span class="baybayin-note-label mono">Filipino roots</span>
+                        <span class="baybayin-note-label mono"><span role="img" aria-label="Philippines">🇵🇭</span> roots</span>
                         <div class="baybayin-content">
                             <span class="baybayin baybayin-line" lang="tl-Tglg" aria-label="Ang pahinaryang ito ay pagmamay-ari ni Mark Morgan">
                                 <span class="baybayin-word" tabindex="0" data-tagalog="Ang" aria-label="Ang">ᜀᜅ᜔</span>
@@ -2833,39 +3551,56 @@
                         </div>
                     </div>
 
-                    <h3 class="skills-heading">My Skills</h3>
+                    <h3 class="skills-heading">skills.md</h3>
                     <div class="code-window">
                         <div class="window-header" aria-hidden="true">
                             <span class="window-dot red"></span>
                             <span class="window-dot yellow"></span>
                             <span class="window-dot green"></span>
-                            <span class="window-title mono">skills.js</span>
+                            <span class="window-title mono">skills.md</span>
                         </div>
                         <div class="window-body">
-<pre><code><span class="kwd">if</span>(language == <span class="str">"java"</span> || language == <span class="str">"C#"</span> || language == <span class="str">"C++"</span> ||
-   framework === <span class="str">"ReactJS"</span> || framework === <span class="str">"ReactNative"</span>){
+<pre><code><span class="kwd">if</span> (<span class="str">"Java"</span>.equals(language)) {
    <span class="var">knowledge</span> = <span class="kwd">true</span>;
 }
 
-<span class="kwd">if</span>($language == <span class="str">"PHP"</span>){
+<span class="kwd">if</span> (language == <span class="str">"C#"</span> || language == <span class="str">"C++"</span>) {
+   <span class="var">knowledge</span> = <span class="kwd">true</span>;
+}
+
+<span class="kwd">if</span> (language === <span class="str">"JavaScript"</span> || framework === <span class="str">"ReactJS"</span> ||
+    framework === <span class="str">"ReactNative"</span> || framework === <span class="str">"Express"</span>) {
+   <span class="var">knowledge</span> = <span class="kwd">true</span>;
+}
+
+<span class="kwd">if</span> ($language === <span class="str">"PHP"</span>) {
    <span class="var">$knowledge</span> = <span class="kwd">true</span>;
 }
 
 <span class="kwd">if</span> language == <span class="str">"Python"</span> <span class="kwd">or</span> framework == <span class="str">"Django"</span>:
    <span class="var">knowledge</span> = <span class="kwd">True</span>
 
-<span class="kwd">If</span> (language = <span class="str">"VB"</span>) <span class="kwd">Then</span>
+<span class="kwd">If</span> language = <span class="str">"VB"</span> <span class="kwd">Then</span>
    <span class="var">knowledge</span> = <span class="kwd">True</span>
 <span class="kwd">End If</span>
 
 <span class="kwd">IF</span> (@dbengine = <span class="str">'MSSQL'</span> <span class="kwd">OR</span> @language = <span class="str">'SQL'</span>)
-  <span class="kwd">BEGIN</span>
-     <span class="kwd">Set</span> <span class="var">knowledge</span> = 1
-  <span class="kwd">END</span>
+<span class="kwd">BEGIN</span>
+   <span class="kwd">SET</span> <span class="var">@knowledge</span> = 1;
+<span class="kwd">END</span>;
 
-<span class="kwd">IF</span> (dbengine = <span class="str">'MYSQL'</span>) <span class="kwd">THEN</span>
-   <span class="kwd">Set</span> <span class="var">knowledge</span> = 1;
-<span class="kwd">END IF</span>;</code></pre>
+<span class="kwd">IF</span> (dbengine <span class="kwd">IN</span> (<span class="str">'MYSQL'</span>, <span class="str">'MARIADB'</span>)) <span class="kwd">THEN</span>
+   <span class="kwd">SET</span> <span class="var">knowledge</span> = 1;
+<span class="kwd">END IF</span>;
+
+<span class="kwd">IF</span> dbengine = <span class="str">'POSTGRES'</span> <span class="kwd">THEN</span>
+   <span class="var">knowledge</span> := 1;
+<span class="kwd">END IF</span>;
+
+<span class="kwd">SELECT CASE</span>
+   <span class="kwd">WHEN</span> :dbengine = <span class="str">'SQLITE'</span> <span class="kwd">THEN</span> 1
+   <span class="kwd">ELSE</span> :knowledge
+<span class="kwd">END AS</span> <span class="var">knowledge</span>;</code></pre>
                         </div>
                     </div>
 
@@ -2874,10 +3609,11 @@
                             <span class="stat-number" data-target="8">0</span><span class="stat-suffix">+</span>
                             <span class="stat-label">Coding Languages</span>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-number" data-target="52">0</span><span class="stat-suffix">+</span>
+                        <button class="stat-box stat-box-project" id="project-history-trigger" type="button" aria-haspopup="dialog" aria-controls="project-history-dialog">
+                            <span class="stat-number" id="project-count-stat" data-target="55">0</span><span class="stat-suffix">+</span>
                             <span class="stat-label">Projects Done</span>
-                        </div>
+                            <span class="stat-action mono">View project history <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+                        </button>
                         <div class="stat-box">
                             <span class="stat-number" data-target="19" data-experience-start="2007">0</span><span class="stat-suffix">+</span>
                             <span class="stat-label">Years Experience</span>
@@ -2942,6 +3678,31 @@
                 </div>
             </section>
 
+
+            <dialog class="project-history-dialog" id="project-history-dialog" aria-labelledby="project-history-title">
+                <div class="project-history-shell">
+                    <header class="project-history-header">
+                        <div>
+                            <p class="section-kicker">Archive / delivered work</p>
+                            <h2 id="project-history-title">Project History</h2>
+                            <p class="project-history-intro">A long-form archive of systems, websites, mobile apps, messaging platforms, campaigns, integrations, CMS builds, and business tools delivered across the years.</p>
+                        </div>
+                        <button class="project-dialog-close" id="project-history-close" type="button" aria-label="Close project history">
+                            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                        </button>
+                    </header>
+                    <div class="project-history-metrics" aria-label="Project archive summary">
+                        <div><strong><span id="project-dialog-count">55</span>+</strong><span>recorded projects</span></div>
+                        <div><strong id="project-dialog-range">2009–2026</strong><span>archive span</span></div>
+                        <div><strong id="project-dialog-years">18</strong><span>calendar years</span></div>
+                    </div>
+                    <div class="project-history-scroll" id="project-history-scroll">
+                        <div class="project-history-scroll-progress" aria-hidden="true"><span id="project-history-scroll-progress"></span></div>
+                        <div class="project-history-list" id="project-history-list"></div>
+                    </div>
+                </div>
+            </dialog>
+
             <footer class="site-footer">
                 <div class="social-media" aria-label="Social profiles">
                     <a href="https://jsfiddle.net/user/zaqxen" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="JSFiddle"><i class="fa-brands fa-jsfiddle" aria-hidden="true"></i></a>
@@ -2950,14 +3711,14 @@
                     <a href="https://github.com/zaqxen" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
                     <span class="social-disabled" role="img" aria-label="Facebook link not configured" title="Facebook link not configured"><i class="fa-brands fa-facebook" aria-hidden="true"></i></span>
                     <span class="social-disabled" role="img" aria-label="Instagram link not configured" title="Instagram link not configured"><i class="fa-brands fa-instagram" aria-hidden="true"></i></span>
-                    <span class="social-disabled" role="img" aria-label="X link not configured" title="X link not configured"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></span>
+                    <a href="https://zaqxen.w3spaces.com/" target="_blank" rel="noopener noreferrer" class="social-link social-link-brand-image" aria-label="W3Spaces"><img src="https://www.w3schools.com/favicon-32x32.png" width="24" height="24" alt="" aria-hidden="true"></a>
                     <a href="https://www.linkedin.com/in/markmorganmiranda/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin" aria-hidden="true"></i></a>
                 </div>
                 <p class="footer-copy"><span id="current-year">2026</span> Morgan. No rights reserved.</p>
                 <div class="update-age mono" aria-label="Time elapsed since this page was last updated">
                     <span class="update-age-dot" aria-hidden="true"></span>
                     <span class="update-age-label">Last updated</span>
-                    <time id="last-updated-age" datetime="2026-08-15T14:15:00+04:00">0y 0mo 0d 00:00:00 ago</time>
+                    <time id="last-updated-age" datetime="2026-08-15T17:51:00+04:00">0y 0mo 0d 00:00:00 ago</time>
                 </div>
             </footer>
         </div>
@@ -2970,6 +3731,589 @@
             const root = document.documentElement;
             const body = document.body;
             const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* Project archive: this is the single source of truth for the project count and dialog. */
+            const projects = Object.freeze([
+                {
+                                "date": "June 2026",
+                                "sort": "2026-06",
+                                "title": "Brand Online Quiz Campaign",
+                                "client": "Liva Group (Brandform)",
+                                "tags": [
+                                                "Campaign",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "May 2026",
+                                "sort": "2026-05",
+                                "title": "Online Campaign",
+                                "client": "Ribbons & Balloons Bakery (R&B) with BrandForm",
+                                "tags": [
+                                                "Campaign",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "January 2026",
+                                "sort": "2026-01",
+                                "title": "Driver Roster — Feature Expansion & Western Region Integration",
+                                "client": "Aman Public Transport (Emirate National Group)",
+                                "tags": [
+                                                "Business System",
+                                                "Integration"
+                                ]
+                },
+                {
+                                "date": "January 2026",
+                                "sort": "2026-01",
+                                "title": "Website + CMS",
+                                "client": "Badami Holding",
+                                "tags": [
+                                                "Website",
+                                                "CMS"
+                                ]
+                },
+                {
+                                "date": "December 2023 – November 2025",
+                                "sort": "2025-11",
+                                "title": "Website Customization + Ads Integration",
+                                "client": "Asimco Batteries",
+                                "tags": [
+                                                "Website",
+                                                "Ads",
+                                                "Integration"
+                                ]
+                },
+                {
+                                "date": "June 2025",
+                                "sort": "2025-06",
+                                "title": "Custom Ads Integration",
+                                "client": "Asimco Global",
+                                "tags": [
+                                                "Ads",
+                                                "Integration"
+                                ]
+                },
+                {
+                                "date": "May 2025",
+                                "sort": "2025-05",
+                                "title": "Business Management Solutions (BMS)",
+                                "client": "FirstShield UAE",
+                                "tags": [
+                                                "Business System",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "April 2025",
+                                "sort": "2025-04",
+                                "title": "Website Campaign Integration & Management",
+                                "client": "Asimco Global / Asimco",
+                                "tags": [
+                                                "Campaign",
+                                                "Integration"
+                                ]
+                },
+                {
+                                "date": "October 2024 – January 2025",
+                                "sort": "2025-01",
+                                "title": "Website Customization + Ads Integration",
+                                "client": "A-MAP",
+                                "tags": [
+                                                "Website",
+                                                "Ads",
+                                                "Integration"
+                                ]
+                },
+                {
+                                "date": "March 2024",
+                                "sort": "2024-03",
+                                "title": "Website + CMS",
+                                "client": "deNovo Partners Dubai",
+                                "tags": [
+                                                "Website",
+                                                "CMS"
+                                ]
+                },
+                {
+                                "date": "January 2024",
+                                "sort": "2024-01",
+                                "title": "Website + CMS",
+                                "client": "Tribonian Law Advisors",
+                                "tags": [
+                                                "Website",
+                                                "CMS"
+                                ]
+                },
+                {
+                                "date": "July 2023",
+                                "sort": "2023-07",
+                                "title": "Sales & Inventory Online System",
+                                "client": "Kinetic / Lazeez",
+                                "tags": [
+                                                "Business System",
+                                                "Inventory"
+                                ]
+                },
+                {
+                                "date": "October 2022",
+                                "sort": "2022-10",
+                                "title": "Meezan Online Digital Crypto Exchange",
+                                "client": "DiTraCon Solutions FZCO",
+                                "tags": [
+                                                "Fintech",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "September 2022",
+                                "sort": "2022-09",
+                                "title": "Custom eCommerce Platform",
+                                "client": "Zazzzy LLC, Minnesota",
+                                "tags": [
+                                                "eCommerce",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "August 2022",
+                                "sort": "2022-08",
+                                "title": "POS Zoho — Additional API Integration",
+                                "client": "Ribbons & Balloons Bakery (R&B)",
+                                "tags": [
+                                                "POS",
+                                                "Zoho",
+                                                "API"
+                                ]
+                },
+                {
+                                "date": "July 2022",
+                                "sort": "2022-07",
+                                "title": "Custom eCommerce Platform",
+                                "client": "50Blocks DMCC",
+                                "tags": [
+                                                "eCommerce",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "November 2021",
+                                "sort": "2021-11",
+                                "title": "POS Zoho CRM — .NET API Integration",
+                                "client": "Ribbons & Balloons Bakery (R&B)",
+                                "tags": [
+                                                "POS",
+                                                "Zoho",
+                                                ".NET",
+                                                "API"
+                                ]
+                },
+                {
+                                "date": "August 2021",
+                                "sort": "2021-08",
+                                "title": "CMS Website",
+                                "client": "Golden Cube Architectural & Interior Design Consultancy",
+                                "tags": [
+                                                "Website",
+                                                "CMS"
+                                ]
+                },
+                {
+                                "date": "January 2021",
+                                "sort": "2021-01",
+                                "title": "Document Management System",
+                                "client": "Emirate National Group (City Transport)",
+                                "tags": [
+                                                "Document Management",
+                                                "Business System"
+                                ]
+                },
+                {
+                                "date": "September 2020",
+                                "sort": "2020-09",
+                                "title": "Driver Roster",
+                                "client": "Emirate National Group (City Transport)",
+                                "tags": [
+                                                "Business System",
+                                                "Operations"
+                                ]
+                },
+                {
+                                "date": "April 2020",
+                                "sort": "2020-04",
+                                "title": "Dobuy Academy — Web-based Learning, Exams & Certification with Online Payments",
+                                "client": "Maria Group International",
+                                "tags": [
+                                                "eLearning",
+                                                "Payments",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "January 2020",
+                                "sort": "2020-01",
+                                "title": "Bibee Online Survey Bot (The Business Bot)",
+                                "client": "",
+                                "tags": [
+                                                "Bot",
+                                                "Survey",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "October 2018",
+                                "sort": "2018-10",
+                                "title": "Star Kids 2018 Model Hunt & Fashion Show Microsite",
+                                "client": "Dalma Mall",
+                                "tags": [
+                                                "Microsite",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "March 2018",
+                                "sort": "2018-03",
+                                "title": "Mother’s Day Art Competition — Facebook Likes Campaign",
+                                "client": "Dalma Mall",
+                                "tags": [
+                                                "Campaign",
+                                                "Social"
+                                ]
+                },
+                {
+                                "date": "June 2017",
+                                "sort": "2017-06",
+                                "title": "Alice Online Chatbot",
+                                "client": "",
+                                "tags": [
+                                                "Chatbot",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "July 2016 – April 2017",
+                                "sort": "2017-04",
+                                "title": "Mobile Subscription, Carrier Direct & MO Billing Integration across GCC Mobile Networks",
+                                "client": "B4U Aflam Middle East Asian Channel under GoingUp Greece",
+                                "tags": [
+                                                "Mobile Billing",
+                                                "Carrier Integration",
+                                                "GCC"
+                                ]
+                },
+                {
+                                "date": "March 2017",
+                                "sort": "2017-03",
+                                "title": "Greeting Card Generator + Automated Emailing Service",
+                                "client": "DoorNo1 — Mother’s Day Guinness World Record greeting-card mosaic campaign",
+                                "tags": [
+                                                "Generator",
+                                                "Email",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "June 2016",
+                                "sort": "2016-06",
+                                "title": "Live-screen SMS Trivia Campaign + Live Winner Generation",
+                                "client": "ENG Football FanFest, Dubai Sports City",
+                                "tags": [
+                                                "SMS",
+                                                "Live Event",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "June 2013 – June 2016",
+                                "sort": "2016-06",
+                                "title": "Web-service SMS Campaign Portal",
+                                "client": "MBC Dream, MBC Arab Idol, Arabs Got Talent & MBC Keys",
+                                "tags": [
+                                                "SMS",
+                                                "Web Service",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "April 2016",
+                                "sort": "2016-04",
+                                "title": "GoDigiSigns — Cloud-based Digital Signage CMS Platform",
+                                "client": "",
+                                "tags": [
+                                                "Digital Signage",
+                                                "CMS",
+                                                "Cloud"
+                                ]
+                },
+                {
+                                "date": "February 2016",
+                                "sort": "2016-02",
+                                "title": "SMSC Subscription Billing + Subscription Management System",
+                                "client": "MBC Golden Club mobile application service",
+                                "tags": [
+                                                "SMSC",
+                                                "Billing",
+                                                "Subscriptions"
+                                ]
+                },
+                {
+                                "date": "November 2015",
+                                "sort": "2015-11",
+                                "title": "Android Polling App",
+                                "client": "Al Foah Company under DoorNo1 Event & Exhibition",
+                                "tags": [
+                                                "Android",
+                                                "Polling",
+                                                "Events"
+                                ]
+                },
+                {
+                                "date": "June – July 2015",
+                                "sort": "2015-07",
+                                "title": "Ramadan Database-driven SMS Campaign + Live Online Reporting",
+                                "client": "",
+                                "tags": [
+                                                "SMS",
+                                                "Reporting",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "March 2015",
+                                "sort": "2015-03",
+                                "title": "Responsive Website",
+                                "client": "GoPCOnline.com",
+                                "tags": [
+                                                "Website",
+                                                "Responsive"
+                                ]
+                },
+                {
+                                "date": "March 2015",
+                                "sort": "2015-03",
+                                "title": "Interactive Digital Signage Android App",
+                                "client": "EMAAR",
+                                "tags": [
+                                                "Android",
+                                                "Digital Signage"
+                                ]
+                },
+                {
+                                "date": "February 2015",
+                                "sort": "2015-02",
+                                "title": "Interactive Digital Signage Android Camera App",
+                                "client": "Swiss Art Gate UAE",
+                                "tags": [
+                                                "Android",
+                                                "Camera",
+                                                "Digital Signage"
+                                ]
+                },
+                {
+                                "date": "December 2014",
+                                "sort": "2014-12",
+                                "title": "Website Development + Hosting",
+                                "client": "Connexionz.co",
+                                "tags": [
+                                                "Website",
+                                                "Hosting"
+                                ]
+                },
+                {
+                                "date": "December 2014",
+                                "sort": "2014-12",
+                                "title": "Interactive Digital Signage Android Camera App",
+                                "client": "ARTUAE",
+                                "tags": [
+                                                "Android",
+                                                "Camera",
+                                                "Digital Signage"
+                                ]
+                },
+                {
+                                "date": "November 2014",
+                                "sort": "2014-11",
+                                "title": "Interactive Mobile, Tablet & Digital Signage Android Photo Printing / E-sharing / Camera App",
+                                "client": "Dewar & Bacardi",
+                                "tags": [
+                                                "Android",
+                                                "Photo",
+                                                "Digital Signage"
+                                ]
+                },
+                {
+                                "date": "April 2014",
+                                "sort": "2014-04",
+                                "title": "Interactive Advertisement Touch-screen Applications — Development Supervision",
+                                "client": "",
+                                "tags": [
+                                                "Touchscreen",
+                                                "Interactive Ads",
+                                                "Supervision"
+                                ]
+                },
+                {
+                                "date": "September 2013",
+                                "sort": "2013-09",
+                                "title": "SMSC / SMPP Platform for MO & MT SMS",
+                                "client": "du & Etisalat mobile networks",
+                                "tags": [
+                                                "SMPP",
+                                                "SMSC",
+                                                "Telecom"
+                                ]
+                },
+                {
+                                "date": "September 2012",
+                                "sort": "2012-09",
+                                "title": "SIM Platform for International SMS Campaign Integration",
+                                "client": "Mobile SIM card based campaign infrastructure",
+                                "tags": [
+                                                "SIM",
+                                                "SMS",
+                                                "Integration"
+                                ]
+                },
+                {
+                                "date": "October 2011",
+                                "sort": "2011-10",
+                                "title": "SMS Campaign + Online Tool",
+                                "client": "Brooke Bond (Red Label)",
+                                "tags": [
+                                                "SMS",
+                                                "Campaign",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "September 2011",
+                                "sort": "2011-09",
+                                "title": "Online Email Registration Tool",
+                                "client": "Motorola",
+                                "tags": [
+                                                "Registration",
+                                                "Email",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "September 2011",
+                                "sort": "2011-09",
+                                "title": "Mobile Webpage",
+                                "client": "NetQin Mobile Antivirus UAE",
+                                "tags": [
+                                                "Mobile Web",
+                                                "Website"
+                                ]
+                },
+                {
+                                "date": "September 2011",
+                                "sort": "2011-09",
+                                "title": "Mobile Advertising Reporting with QR Codes",
+                                "client": "YAM Group (Pizza Hut)",
+                                "tags": [
+                                                "QR Code",
+                                                "Reporting",
+                                                "Mobile"
+                                ]
+                },
+                {
+                                "date": "September 2011",
+                                "sort": "2011-09",
+                                "title": "Mobile Web Tool",
+                                "client": "DAFZA (Dubai Airport Freezone)",
+                                "tags": [
+                                                "Mobile Web",
+                                                "Tool"
+                                ]
+                },
+                {
+                                "date": "May 2011",
+                                "sort": "2011-05",
+                                "title": "Summer Bonanza SMS Campaign + Online Tool",
+                                "client": "YoSpace",
+                                "tags": [
+                                                "SMS",
+                                                "Campaign",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "March 2011",
+                                "sort": "2011-03",
+                                "title": "Web Tool Application",
+                                "client": "KrossOver — Right Guard",
+                                "tags": [
+                                                "Web App",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "November 2010",
+                                "sort": "2010-11",
+                                "title": "Online SMSC Gateway Tool",
+                                "client": "YoSpace",
+                                "tags": [
+                                                "SMSC",
+                                                "Gateway",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "July 2010",
+                                "sort": "2010-07",
+                                "title": "Online CMS + Reporting Tool",
+                                "client": "Nokia Survey",
+                                "tags": [
+                                                "CMS",
+                                                "Reporting",
+                                                "Survey"
+                                ]
+                },
+                {
+                                "date": "June 2010",
+                                "sort": "2010-06",
+                                "title": "SMS Campaign + Online CMS Tool",
+                                "client": "Noor Sunflower Oil",
+                                "tags": [
+                                                "SMS",
+                                                "CMS",
+                                                "Campaign"
+                                ]
+                },
+                {
+                                "date": "September 2009",
+                                "sort": "2009-09",
+                                "title": "Reporting Tool",
+                                "client": "EMP (Emirates Marketing & Promotions) — Postcard Millionaire",
+                                "tags": [
+                                                "Reporting",
+                                                "Web"
+                                ]
+                },
+                {
+                                "date": "August 2009",
+                                "sort": "2009-08",
+                                "title": "SMS-based Subscription Service",
+                                "client": "Catholic Mobile World",
+                                "tags": [
+                                                "SMS",
+                                                "Subscriptions"
+                                ]
+                },
+                {
+                                "date": "May 2009",
+                                "sort": "2009-05",
+                                "title": "Automated Online Reporting with Data Matrix + QR Code Subscription",
+                                "client": "Jumeirah (Barzar)",
+                                "tags": [
+                                                "QR Code",
+                                                "Data Matrix",
+                                                "Reporting"
+                                ]
+                }
+]);
 
             /* Theme */
             const themeToggle = document.getElementById('theme-toggle');
@@ -3014,6 +4358,20 @@
             const menuButton = document.getElementById('menu-button');
             const mobileNav = document.getElementById('mobile-nav');
             const mobileLinks = mobileNav.querySelectorAll('a');
+            const mobileAvatarOrbit = document.getElementById('mobile-avatar-orbit');
+
+            function toggleMobileAvatar() {
+                const flipped = mobileAvatarOrbit.classList.toggle('is-flipped');
+                mobileAvatarOrbit.setAttribute('aria-pressed', String(flipped));
+            }
+
+            mobileAvatarOrbit.addEventListener('click', toggleMobileAvatar);
+            mobileAvatarOrbit.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleMobileAvatar();
+                }
+            });
 
             function setMenu(open) {
                 mobileNav.classList.toggle('is-open', open);
@@ -3138,24 +4496,293 @@
                     revealObserver.observe(element);
                 });
 
-                const sectionObserver = new IntersectionObserver(function (entries) {
-                    const visible = entries
-                        .filter(function (entry) { return entry.isIntersecting; })
-                        .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
-
-                    if (visible.length) {
-                        setCurrentSection(visible[0].target.id);
-                    }
-                }, { threshold: [0.25, 0.45, 0.65], rootMargin: '-18% 0px -58% 0px' });
-
-                sections.forEach(function (section) {
-                    sectionObserver.observe(section);
-                });
+                /* Section activation is handled below by a position-based scrollspy.
+                   This avoids intersection-ratio failures on very tall sections. */
             } else {
                 revealElements.forEach(function (element) {
                     element.classList.add('active');
                 });
             }
+
+            let sectionSpyTicking = false;
+
+            function updateCurrentSectionFromScroll() {
+                /* Use a reading line roughly one-third down the viewport. The last section
+                   whose top has crossed that line is the active one, regardless of its height. */
+                const readingLine = window.innerHeight * 0.34;
+                let currentSection = sections[0];
+
+                sections.forEach(function (section) {
+                    if (section.getBoundingClientRect().top <= readingLine) {
+                        currentSection = section;
+                    }
+                });
+
+                /* Ensure the final navigation item wins at the bottom of the page. */
+                const atPageBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
+                if (atPageBottom && sections.length) {
+                    currentSection = sections[sections.length - 1];
+                }
+
+                setCurrentSection(currentSection.id);
+                sectionSpyTicking = false;
+            }
+
+            window.addEventListener('scroll', function () {
+                if (!sectionSpyTicking) {
+                    sectionSpyTicking = true;
+                    window.requestAnimationFrame(updateCurrentSectionFromScroll);
+                }
+            }, { passive: true });
+
+            sectionLinks.forEach(function (link) {
+                link.addEventListener('click', function () {
+                    const targetId = link.getAttribute('href').slice(1);
+                    setCurrentSection(targetId);
+                });
+            });
+
+            updateCurrentSectionFromScroll();
+
+
+            /* Data-driven project archive + native dialog. */
+            const projectCountHero = document.getElementById('project-count-hero');
+            const projectCountStat = document.getElementById('project-count-stat');
+            const projectHistoryTrigger = document.getElementById('project-history-trigger');
+            const projectHistoryDialog = document.getElementById('project-history-dialog');
+            const projectHistoryClose = document.getElementById('project-history-close');
+            const projectHistoryList = document.getElementById('project-history-list');
+            const projectHistoryScroll = document.getElementById('project-history-scroll');
+            const projectHistoryScrollProgress = document.getElementById('project-history-scroll-progress');
+            const projectDialogCount = document.getElementById('project-dialog-count');
+            const projectDialogRange = document.getElementById('project-dialog-range');
+            const projectDialogYears = document.getElementById('project-dialog-years');
+            let projectHistoryRaf = 0;
+
+            function syncProjectCounts() {
+                const projectCount = projects.length;
+                const years = projects.map(function (project) { return Number(project.sort.slice(0, 4)); });
+                const firstYear = Math.min.apply(null, years);
+                const latestYear = Math.max.apply(null, years);
+
+                projectCountHero.textContent = String(projectCount);
+                projectCountStat.setAttribute('data-target', String(projectCount));
+                projectDialogCount.textContent = String(projectCount);
+                projectDialogRange.textContent = firstYear + '–' + latestYear;
+                projectDialogYears.textContent = String((latestYear - firstYear) + 1);
+            }
+
+            function renderProjectHistory() {
+                const sortedProjects = projects.slice().sort(function (a, b) { return b.sort.localeCompare(a.sort); });
+                const groupedProjects = new Map();
+
+                sortedProjects.forEach(function (project) {
+                    const year = project.sort.slice(0, 4);
+                    if (!groupedProjects.has(year)) groupedProjects.set(year, []);
+                    groupedProjects.get(year).push(project);
+                });
+
+                const fragment = document.createDocumentFragment();
+                let visualIndex = 0;
+
+                groupedProjects.forEach(function (yearProjects, year) {
+                    const group = document.createElement('section');
+                    group.className = 'project-year-group';
+
+                    const heading = document.createElement('div');
+                    heading.className = 'project-year-heading';
+                    const yearLabel = document.createElement('strong');
+                    yearLabel.textContent = year;
+                    const yearCount = document.createElement('span');
+                    yearCount.textContent = yearProjects.length + (yearProjects.length === 1 ? ' project' : ' projects');
+                    heading.append(yearLabel, yearCount);
+                    group.appendChild(heading);
+
+                    const items = document.createElement('div');
+                    items.className = 'project-year-items';
+
+                    yearProjects.forEach(function (project) {
+                        const article = document.createElement('article');
+                        article.className = 'project-history-item';
+
+                        const index = document.createElement('span');
+                        index.className = 'project-history-index';
+                        index.textContent = '#' + String(projects.length - visualIndex).padStart(3, '0');
+
+                        const content = document.createElement('div');
+                        content.className = 'project-history-content';
+                        const date = document.createElement('time');
+                        date.className = 'project-history-date';
+                        date.textContent = project.date;
+                        const title = document.createElement('h3');
+                        title.textContent = project.title;
+                        content.append(date, title);
+
+                        if (project.client) {
+                            const client = document.createElement('p');
+                            client.className = 'project-history-client';
+                            client.textContent = project.client;
+                            content.appendChild(client);
+                        }
+
+                        if (project.tags && project.tags.length) {
+                            const tags = document.createElement('div');
+                            tags.className = 'project-history-tags';
+                            project.tags.forEach(function (tag) {
+                                const tagElement = document.createElement('span');
+                                tagElement.className = 'project-history-tag';
+                                tagElement.textContent = tag;
+                                tags.appendChild(tagElement);
+                            });
+                            content.appendChild(tags);
+                        }
+
+                        article.append(index, content);
+                        items.appendChild(article);
+                        visualIndex += 1;
+                    });
+
+                    group.appendChild(items);
+                    fragment.appendChild(group);
+                });
+
+                projectHistoryList.replaceChildren(fragment);
+            }
+
+            let projectHistoryLastScrollTop = 0;
+            let projectHistoryLastScrollTime = performance.now();
+
+            function primeProjectHistoryCards() {
+                if (!projectHistoryDialog.open) return;
+
+                const viewport = projectHistoryScroll.getBoundingClientRect();
+                const revealLine = viewport.bottom - 22;
+                const cards = projectHistoryList.querySelectorAll('.project-history-item');
+
+                cards.forEach(function (card) {
+                    const rect = card.getBoundingClientRect();
+                    card.classList.remove('is-visible', 'is-initial');
+
+                    /* Content already comfortably inside the viewport opens fully readable.
+                       Only the small strip at the bottom is reserved for the scroll-in effect. */
+                    if (rect.top < revealLine && rect.bottom > viewport.top) {
+                        card.classList.add('is-visible', 'is-initial');
+                    }
+                });
+
+                window.requestAnimationFrame(function () {
+                    cards.forEach(function (card) {
+                        card.classList.remove('is-initial');
+                    });
+                });
+
+                projectHistoryLastScrollTop = projectHistoryScroll.scrollTop;
+                projectHistoryLastScrollTime = performance.now();
+            }
+
+            function updateProjectHistoryReveal() {
+                projectHistoryRaf = 0;
+                if (!projectHistoryDialog.open) return;
+
+                const viewport = projectHistoryScroll.getBoundingClientRect();
+                if (viewport.height <= 0) return;
+
+                const currentScrollTop = projectHistoryScroll.scrollTop;
+                const now = performance.now();
+                const scrollDistance = Math.abs(currentScrollTop - projectHistoryLastScrollTop);
+                const elapsed = Math.max(16, now - projectHistoryLastScrollTime);
+                const scrollVelocity = scrollDistance / elapsed; // pixels per millisecond
+                const scrollingDown = currentScrollTop >= projectHistoryLastScrollTop;
+                const revealLine = viewport.bottom - 22;
+                const cards = projectHistoryList.querySelectorAll('.project-history-item');
+
+                /* Slow browsing keeps the full reveal. Fast wheel/touch scrolling shortens
+                   it aggressively so cards are readable almost immediately instead of
+                   visibly lagging behind the visitor's scroll position. */
+                let revealDuration = 420;
+                if (scrollVelocity >= 2.2) revealDuration = 65;
+                else if (scrollVelocity >= 1.35) revealDuration = 95;
+                else if (scrollVelocity >= 0.8) revealDuration = 150;
+                else if (scrollVelocity >= 0.4) revealDuration = 235;
+                else if (scrollVelocity >= 0.18) revealDuration = 320;
+
+                cards.forEach(function (card) {
+                    const rect = card.getBoundingClientRect();
+
+                    if (scrollingDown) {
+                        /* Reveal only as a new card enters through the small bottom band.
+                           Once revealed, it remains perfectly still while the user reads it. */
+                        if (rect.top <= revealLine && rect.bottom > viewport.top) {
+                            card.style.setProperty('--project-reveal-duration', revealDuration + 'ms');
+                            card.classList.add('is-visible');
+                        }
+                    } else if (rect.top > revealLine) {
+                        /* Scrolling back upward resets only the cards that have dropped
+                           below the reveal line, ready to animate again on the next pass. */
+                        card.style.setProperty('--project-reveal-duration', revealDuration + 'ms');
+                        card.classList.remove('is-visible');
+                    }
+                });
+
+                projectHistoryLastScrollTop = currentScrollTop;
+                projectHistoryLastScrollTime = now;
+            }
+
+            function requestProjectHistoryReveal() {
+                if (projectHistoryRaf) return;
+                projectHistoryRaf = window.requestAnimationFrame(updateProjectHistoryReveal);
+            }
+
+            function updateProjectHistoryScrollEffects() {
+                const maxScroll = projectHistoryScroll.scrollHeight - projectHistoryScroll.clientHeight;
+                const progress = maxScroll > 0 ? projectHistoryScroll.scrollTop / maxScroll : 0;
+                projectHistoryScrollProgress.style.transform = 'scaleX(' + Math.max(0, Math.min(1, progress)) + ')';
+                projectHistoryScroll.style.setProperty('--archive-y', Math.round(progress * 180) + 'px');
+                requestProjectHistoryReveal();
+            }
+
+            function openProjectHistory() {
+                renderProjectHistory();
+                if (typeof projectHistoryDialog.showModal === 'function') projectHistoryDialog.showModal();
+                else projectHistoryDialog.setAttribute('open', '');
+
+                projectHistoryScroll.scrollTop = 0;
+                projectHistoryLastScrollTop = 0;
+                projectHistoryLastScrollTime = performance.now();
+                projectHistoryScrollProgress.style.transform = 'scaleX(0)';
+                projectHistoryScroll.style.setProperty('--archive-y', '0px');
+
+                /* Prime the readable viewport after layout. Cards already on screen stay
+                   still; only future cards entering through the bottom animate. */
+                window.requestAnimationFrame(function () {
+                    window.requestAnimationFrame(primeProjectHistoryCards);
+                });
+                window.setTimeout(primeProjectHistoryCards, 1380);
+            }
+
+            function closeProjectHistory() {
+                if (projectHistoryRaf) {
+                    window.cancelAnimationFrame(projectHistoryRaf);
+                    projectHistoryRaf = 0;
+                }
+                if (typeof projectHistoryDialog.close === 'function' && projectHistoryDialog.open) projectHistoryDialog.close();
+                else projectHistoryDialog.removeAttribute('open');
+            }
+
+            syncProjectCounts();
+            projectHistoryTrigger.addEventListener('click', openProjectHistory);
+            projectHistoryClose.addEventListener('click', closeProjectHistory);
+            projectHistoryScroll.addEventListener('scroll', updateProjectHistoryScrollEffects, { passive: true });
+            window.addEventListener('resize', requestProjectHistoryReveal, { passive: true });
+            projectHistoryDialog.addEventListener('click', function (event) {
+                if (event.target === projectHistoryDialog) closeProjectHistory();
+            });
+            projectHistoryDialog.addEventListener('close', function () {
+                if (projectHistoryRaf) {
+                    window.cancelAnimationFrame(projectHistoryRaf);
+                    projectHistoryRaf = 0;
+                }
+            });
 
             /* Experience is always current: current calendar year minus the 2007 start year. */
             const EXPERIENCE_START_YEAR = 2007;
