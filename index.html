@@ -1641,8 +1641,8 @@
             animation: portfolio-impact-jump 900ms cubic-bezier(0.28, 0.84, 0.42, 1) both !important;
         }
 
-        .pointer-3d-card.is-impact-swivel .project-visual {
-            animation: portfolio-impact-swivel 980ms cubic-bezier(0.2, 0.8, 0.2, 1) both !important;
+        .pointer-3d-card.is-impact-spin .project-visual {
+            animation: portfolio-impact-spin 1350ms cubic-bezier(0.12, 0.72, 0.18, 1) both !important;
         }
 
         @keyframes portfolio-impact-jiggle {
@@ -1671,12 +1671,25 @@
             86% { transform: perspective(1100px) rotateX(1deg) rotateY(var(--tilt-y)) translate3d(0, 3px, 4px) scale(1.035,0.99); }
         }
 
-        @keyframes portfolio-impact-swivel {
-            0%, 100% { transform: perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(0,0,0) rotateZ(0) scale(1.025); }
-            18% { transform: perspective(1100px) rotateX(8deg) rotateY(72deg) translate3d(0,-8px,40px) rotateZ(-3deg) scale(1.04); }
-            42% { transform: perspective(1100px) rotateX(-5deg) rotateY(178deg) translate3d(0,-4px,55px) rotateZ(2deg) scale(1.06); }
-            66% { transform: perspective(1100px) rotateX(4deg) rotateY(286deg) translate3d(0,-7px,42px) rotateZ(-2deg) scale(1.045); }
-            84% { transform: perspective(1100px) rotateX(-2deg) rotateY(350deg) translate3d(0,-2px,14px) rotateZ(1deg) scale(1.03); }
+        @keyframes portfolio-impact-spin {
+            0% {
+                transform: perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(0,0,0) rotateZ(0deg) scale(1.025);
+            }
+            44% {
+                transform: perspective(1100px) rotateX(0deg) rotateY(0deg) translate3d(0,-8px,48px) rotateZ(585deg) scale(1.07);
+            }
+            66% {
+                transform: perspective(1100px) rotateX(0deg) rotateY(0deg) translate3d(0,-5px,32px) rotateZ(690deg) scale(1.05);
+            }
+            82% {
+                transform: perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(0,-2px,18px) rotateZ(716deg) scale(1.038);
+            }
+            92% {
+                transform: perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(0,0,7px) rotateZ(724deg) scale(1.03);
+            }
+            100% {
+                transform: perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(0,0,0) rotateZ(720deg) scale(1.025);
+            }
         }
 
         /* Portfolio cards stay visible by default. The entrance animation is enhancement only,
@@ -2191,6 +2204,58 @@
             font-size: 0.82rem;
         }
 
+
+        .update-age {
+            width: fit-content;
+            max-width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 12px auto 0;
+            padding: 7px 11px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            background: rgba(127, 127, 127, 0.045);
+            font-size: 0.72rem;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease, background-color 0.22s ease;
+        }
+
+        .update-age:hover {
+            transform: translateY(-2px);
+            color: var(--text);
+            border-color: rgba(4, 170, 109, 0.46);
+            background: rgba(4, 170, 109, 0.055);
+            box-shadow: 0 8px 24px rgba(4, 170, 109, 0.10);
+        }
+
+        .update-age-dot {
+            width: 6px;
+            height: 6px;
+            flex: 0 0 6px;
+            border-radius: 50%;
+            background: var(--primary-bright);
+            box-shadow: 0 0 10px var(--effect-glow);
+            animation: update-age-pulse 2.2s ease-in-out infinite;
+        }
+
+        .update-age-label {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        #last-updated-age {
+            white-space: nowrap;
+        }
+
+        @keyframes update-age-pulse {
+            0%, 100% { opacity: 0.55; transform: scale(0.82); }
+            50% { opacity: 1; transform: scale(1.18); }
+        }
+
         /* Reveal is progressive enhancement: content remains visible if JS is unavailable. */
         .js .reveal {
             opacity: 0;
@@ -2204,7 +2269,7 @@
         }
 
         /* Consistent hover feedback for bordered container-like divs/spans. */
-        :is(.glass-surface, .avatar-face, .availability, .hero-meta-item, .tech-marquee, .tech-group span, .baybayin-note, .code-window, .stat-box, .contact-photo, .contact-item .contact-icon) {
+        :is(.glass-surface, .avatar-face, .availability, .hero-meta-item, .tech-marquee, .tech-group span, .baybayin-note, .code-window, .stat-box, .contact-photo, .contact-item .contact-icon, .update-age) {
             transition-property: transform, border-color, box-shadow, background-color, color;
             transition-duration: 0.25s;
             transition-timing-function: ease;
@@ -2627,7 +2692,7 @@
                 </div>
                 <div class="hero-meta" aria-label="Professional highlights">
                     <div class="hero-meta-item">
-                        <strong>17+ years</strong>
+                        <strong><span id="experience-years-hero">19</span>+ years</strong>
                         <span>Systems and software experience</span>
                     </div>
                     <div class="hero-meta-item">
@@ -2767,7 +2832,7 @@
                             <span class="stat-label">Projects Done</span>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-number" data-target="17">0</span><span class="stat-suffix">+</span>
+                            <span class="stat-number" data-target="19" data-experience-start="2007">0</span><span class="stat-suffix">+</span>
                             <span class="stat-label">Years Experience</span>
                         </div>
                         <div class="stat-box">
@@ -2824,6 +2889,11 @@
                     <a href="https://www.linkedin.com/in/markmorganmiranda/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin" aria-hidden="true"></i></a>
                 </div>
                 <p class="footer-copy"><span id="current-year">2026</span> Morgan. No rights reserved.</p>
+                <div class="update-age mono" aria-label="Time elapsed since this page was last updated">
+                    <span class="update-age-dot" aria-hidden="true"></span>
+                    <span class="update-age-label">Last updated</span>
+                    <time id="last-updated-age" datetime="2026-08-15T13:23:00+04:00">0y 0mo 0d 00:00:00 ago</time>
+                </div>
             </footer>
         </div>
     </main>
@@ -3022,6 +3092,19 @@
                 });
             }
 
+            /* Experience is always current: current calendar year minus the 2007 start year. */
+            const EXPERIENCE_START_YEAR = 2007;
+            const experienceYears = Math.max(0, new Date().getFullYear() - EXPERIENCE_START_YEAR);
+            const experienceHero = document.getElementById('experience-years-hero');
+            const experienceCounter = document.querySelector('.stat-number[data-experience-start="2007"]');
+
+            if (experienceHero) {
+                experienceHero.textContent = String(experienceYears);
+            }
+            if (experienceCounter) {
+                experienceCounter.setAttribute('data-target', String(experienceYears));
+            }
+
             /* Stats: replay the count-up every time the section becomes visible again. */
             const statsSection = document.getElementById('stats-section');
             const counters = statsSection.querySelectorAll('.stat-number');
@@ -3117,7 +3200,7 @@
             /* Portfolio 3D pointer tracking + random click impacts. */
             const portfolioCards = document.querySelectorAll('.pointer-3d-card');
             const finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-            const impactNames = ['jiggle', 'sway', 'jump', 'swivel'];
+            const impactNames = ['jiggle', 'sway', 'jump', 'spin'];
             const impactClasses = impactNames.map(function (name) { return 'is-impact-' + name; });
 
             function clearPortfolioImpact(card) {
@@ -3230,6 +3313,84 @@
                     });
                 });
             }
+
+            /* Live age of this page update. Change the <time datetime> value whenever
+               the site is intentionally updated; the display then counts upward every second. */
+            const lastUpdatedAge = document.getElementById('last-updated-age');
+
+            function addYearsClamped(date, years) {
+                const result = new Date(date.getTime());
+                const originalMonth = result.getMonth();
+                result.setFullYear(result.getFullYear() + years);
+                if (result.getMonth() !== originalMonth) {
+                    result.setDate(0);
+                }
+                return result;
+            }
+
+            function addMonthsClamped(date, months) {
+                const result = new Date(date.getTime());
+                const originalDay = result.getDate();
+                result.setDate(1);
+                result.setMonth(result.getMonth() + months);
+                const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+                result.setDate(Math.min(originalDay, lastDay));
+                return result;
+            }
+
+            function getCalendarAge(start, end) {
+                if (end <= start) {
+                    return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+                }
+
+                let cursor = new Date(start.getTime());
+                let years = end.getFullYear() - cursor.getFullYear();
+                let next = addYearsClamped(cursor, years);
+                if (next > end) {
+                    years -= 1;
+                    next = addYearsClamped(cursor, years);
+                }
+                cursor = next;
+
+                let months = ((end.getFullYear() - cursor.getFullYear()) * 12) + (end.getMonth() - cursor.getMonth());
+                next = addMonthsClamped(cursor, months);
+                if (next > end) {
+                    months -= 1;
+                    next = addMonthsClamped(cursor, months);
+                }
+                cursor = next;
+
+                let remaining = Math.max(0, end.getTime() - cursor.getTime());
+                const days = Math.floor(remaining / 86400000);
+                remaining -= days * 86400000;
+                const hours = Math.floor(remaining / 3600000);
+                remaining -= hours * 3600000;
+                const minutes = Math.floor(remaining / 60000);
+                remaining -= minutes * 60000;
+                const seconds = Math.floor(remaining / 1000);
+
+                return { years: years, months: months, days: days, hours: hours, minutes: minutes, seconds: seconds };
+            }
+
+            function updateLastUpdatedAge() {
+                if (!lastUpdatedAge) {
+                    return;
+                }
+
+                const updatedAt = new Date(lastUpdatedAge.getAttribute('datetime'));
+                if (Number.isNaN(updatedAt.getTime())) {
+                    lastUpdatedAge.textContent = 'update time unavailable';
+                    return;
+                }
+
+                const age = getCalendarAge(updatedAt, new Date());
+                const pad2 = function (value) { return String(value).padStart(2, '0'); };
+                lastUpdatedAge.textContent = age.years + 'y ' + age.months + 'mo ' + age.days + 'd ' +
+                    pad2(age.hours) + ':' + pad2(age.minutes) + ':' + pad2(age.seconds) + ' ago';
+            }
+
+            updateLastUpdatedAge();
+            window.setInterval(updateLastUpdatedAge, 1000);
 
             document.getElementById('current-year').textContent = String(new Date().getFullYear());
         }());
